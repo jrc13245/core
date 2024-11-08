@@ -638,7 +638,7 @@ void ObjectMgr::LoadSavedVariable()
         bar.step();
 
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u world persistent variables ", total_count);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u world persistent variables", total_count);
         return;
     }
 
