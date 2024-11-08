@@ -8,7 +8,7 @@ IF v = 0 THEN
 INSERT INTO `migrations` VALUES ('20241108102245');
 -- Add your query below.
 
--- Moved to characters db (worldstates)
+-- Moved to characters db (world_persistent_variables)
 DROP TABLE IF EXISTS `variables`;
 
 -- End of migration.

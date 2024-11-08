@@ -8,8 +8,8 @@ IF v = 0 THEN
 INSERT INTO `migrations` VALUES ('20241108102245');
 -- Add your query below.
 
-DROP TABLE IF EXISTS `worldstates`;
-CREATE TABLE `worldstates` (
+DROP TABLE IF EXISTS `world_persistent_variables`;
+CREATE TABLE `world_persistent_variables` (
   `index` int(10) unsigned NOT NULL DEFAULT 0,
   `value` int(10) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`index`)

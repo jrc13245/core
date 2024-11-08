@@ -572,8 +572,8 @@ void ObjectMgr::_SaveVariable(SavedVariable const& toSave)
     // Must do this in a transaction, else if worker threads > 1 we could do one before the other
     // when order is important...
     CharacterDatabase.BeginTransaction();
-    CharacterDatabase.PExecute("DELETE FROM `worldstates` WHERE `index` = %u", toSave.uiIndex);
-    CharacterDatabase.PExecute("INSERT INTO `worldstates` (`index`, `value`) VALUES (%u, %u)", toSave.uiIndex, toSave.uiValue);
+    CharacterDatabase.PExecute("DELETE FROM `world_persistent_variables` WHERE `index` = %u", toSave.uiIndex);
+    CharacterDatabase.PExecute("INSERT INTO `world_persistent_variables` (`index`, `value`) VALUES (%u, %u)", toSave.uiIndex, toSave.uiValue);
     CharacterDatabase.CommitTransaction();
 }
 
@@ -628,7 +628,7 @@ void ObjectMgr::LoadSavedVariable()
 {
     m_SavedVariables.clear();
 
-    std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT `index`, `value` FROM `worldstates`"));
+    std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT `index`, `value` FROM `world_persistent_variables`"));
 
     uint32 total_count = 0;
 
@@ -638,7 +638,7 @@ void ObjectMgr::LoadSavedVariable()
         bar.step();
 
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u worldstates ", total_count);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u world persistent variables ", total_count);
         return;
     }
 
@@ -654,7 +654,7 @@ void ObjectMgr::LoadSavedVariable()
     while (result->NextRow());
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u worldstates", total_count);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u world persistent variables", total_count);
 }
 
 // Caching player data

@@ -1333,8 +1333,8 @@ void World::SetInitialWorldSettings()
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
     sInstanceStatistics.LoadFromDB();
 
-    // Loads world save states (Wareffort, Stranglethorn Vale Fishing , ...)
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading worldstates...");
+    // Loads world persistent variables (Wareffort, Stranglethorn Vale Fishing , ...)
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading world_persistent_variables...");
     sObjectMgr.LoadSavedVariable();
 
 
