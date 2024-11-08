@@ -571,10 +571,10 @@ void ObjectMgr::_SaveVariable(SavedVariable const& toSave)
 {
     // Must do this in a transaction, else if worker threads > 1 we could do one before the other
     // when order is important...
-    WorldDatabase.BeginTransaction();
-    WorldDatabase.PExecute("DELETE FROM `variables` WHERE `index` = %u", toSave.uiIndex);
-    WorldDatabase.PExecute("INSERT INTO `variables` (`index`, `value`) VALUES (%u, %u)", toSave.uiIndex, toSave.uiValue);
-    WorldDatabase.CommitTransaction();
+    CharacterDatabase.BeginTransaction();
+    CharacterDatabase.PExecute("DELETE FROM `worldstates` WHERE `index` = %u", toSave.uiIndex);
+    CharacterDatabase.PExecute("INSERT INTO `worldstates` (`index`, `value`) VALUES (%u, %u)", toSave.uiIndex, toSave.uiValue);
+    CharacterDatabase.CommitTransaction();
 }
 
 void ObjectMgr::InitSavedVariable(uint32 index, uint32 value)
@@ -614,20 +614,6 @@ void ObjectMgr::SetSavedVariable(uint32 index, uint32 value, bool autoSave)
         _SaveVariable(variable);
 }
 
-void ObjectMgr::LoadVariable(uint32 index, uint32* variable, uint32 defaultValue, uint32 maxValue, uint32 minValue)
-{
-    bool inIndex = false;
-    (*variable) = GetSavedVariable(index, defaultValue, &inIndex);
-    uint32 originalValue = (*variable);
-    if (maxValue != 0 && (*variable) > maxValue)
-        (*variable) = defaultValue;
-    if ((*variable) < minValue)
-        (*variable) = defaultValue;
-    if (!inIndex)
-        _InsertVariable(index, (*variable), true);
-    if (originalValue != (*variable))
-        SetSavedVariable(index, (*variable), true);
-}
 void ObjectMgr::SaveVariables()
 {
     SavedVariablesVector::iterator it;
@@ -642,7 +628,7 @@ void ObjectMgr::LoadSavedVariable()
 {
     m_SavedVariables.clear();
 
-    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `index`, `value` FROM `variables`"));
+    std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT `index`, `value` FROM `worldstates`"));
 
     uint32 total_count = 0;
 
@@ -652,7 +638,7 @@ void ObjectMgr::LoadSavedVariable()
         bar.step();
 
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u saved variables", total_count);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u worldstates ", total_count);
         return;
     }
 
@@ -668,7 +654,7 @@ void ObjectMgr::LoadSavedVariable()
     while (result->NextRow());
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u saved variables", total_count);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u worldstates", total_count);
 }
 
 // Caching player data

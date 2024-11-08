@@ -1890,7 +1890,7 @@ bool ChatHandler::HandleReloadPetitions(char*)
 bool ChatHandler::HandleReloadVariablesCommand(char*)
 {
     sObjectMgr.LoadSavedVariable();
-    SendSysMessage("Table `variables` has been reloaded.");
+    SendSysMessage("Table `worldstates` has been reloaded.");
     return true;
 }
 
