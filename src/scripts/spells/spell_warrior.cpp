@@ -39,7 +39,7 @@ struct WarriorBloodthirstScript : SpellScript
 {
     void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
-        if (effIdx == EFFECT_INDEX_0)
+        if (effIdx == EFFECT_INDEX_0 && spell->m_casterUnit)
         {
             float attackPower = spell->m_casterUnit->GetTotalAttackPowerValue(BASE_ATTACK);
             if (spell->GetUnitTarget())
@@ -59,7 +59,7 @@ struct WarriorShieldSlamScript : SpellScript
 {
     void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
-        if (effIdx == EFFECT_INDEX_1)
+        if (effIdx == EFFECT_INDEX_1 && spell->m_casterUnit)
         {
             spell->damage += spell->m_casterUnit->GetShieldBlockValue();
         }
@@ -76,7 +76,7 @@ struct WarriorExecuteDamageScript : SpellScript
 {
     void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
-        if (effIdx == EFFECT_INDEX_0)
+        if (effIdx == EFFECT_INDEX_0 && spell->m_casterUnit)
         {
             spell->m_casterUnit->SetPower(POWER_RAGE, 0);
         }
