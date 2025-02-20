@@ -381,10 +381,6 @@ SpellMissInfo SpellCaster::MeleeSpellHitResult(Unit const* pVictim, SpellEntry c
 {
     WeaponAttackType attType = spell->DmgClass == SPELL_DAMAGE_CLASS_RANGED ? RANGED_ATTACK : BASE_ATTACK;
 
-    // Warrior spell Execute (5308) should never dodge, miss, resist ... Only the trigger can (20647)
-    if (spell->IsFitToFamily<SPELLFAMILY_WARRIOR, CF_WARRIOR_EXECUTE>() && spell->Id != 20647)
-        return SPELL_MISS_NONE;
-
     // Hammer of Wrath should not use weapon skill, but Bloodthirst should.
     // bonus from skills is 0.04% per skill Diff
     int32 attackerWeaponSkill = (spell->rangeIndex == SPELL_RANGE_IDX_COMBAT || spell->EquippedItemClass == ITEM_CLASS_WEAPON) ?
