@@ -1546,9 +1546,6 @@ struct npc_shahramAI : ScriptedPetAI
 
                 case 1:
                     shahramSpell = SPELL_FLAMES_OF_SHAHRAM;
-                    if (!urand(0, 99))
-                        DoScriptText(-1409006, m_creature);
-
                     break;
 
                 default:
