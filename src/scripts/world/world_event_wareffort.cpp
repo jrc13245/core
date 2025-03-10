@@ -1427,7 +1427,7 @@ struct npc_aqwar_saurfangAI : ScriptedAI
 
                 if (m_speechStep == 10)
                 {
-                    sWorld.SendWorldText(SCRIPT_SAURFANG_FINAL_BATTLE);
+                    sWorld.SendBroadcastTextToWorld(SCRIPT_SAURFANG_FINAL_BATTLE);
                     m_inSpeech = false;
                     m_movingToGate = true;
                     m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_NPC);

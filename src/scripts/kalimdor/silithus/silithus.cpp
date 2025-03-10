@@ -2171,7 +2171,7 @@ struct scarab_gongAI: public GameObjectAI
             return;
 
         // Announce Champion to the world
-        sWorld.SendWorldText(GLOBAL_TEXT_CHAMPION, player->GetName());
+        sWorld.SendBroadcastTextToWorld(GLOBAL_TEXT_CHAMPION, player->GetObjectGuid());
 
         eventTimer += 1000;
         eventStage = STAGE_OPEN_GATES;
