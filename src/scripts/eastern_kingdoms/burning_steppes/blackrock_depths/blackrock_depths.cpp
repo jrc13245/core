@@ -65,6 +65,13 @@ enum
     //4 or 6 in total? 1+2+1 / 2+2+2 / 3+3. Depending on this, code should be changed.
     MAX_MOB_AMOUNT      = 8,
 
+    SAY_GRIMSTONE_ARENA1    = 5441,
+    SAY_GRIMSTONE_ARENA2    = 5442,
+    SAY_GRIMSTONE_ARENA3    = 5443,
+    SAY_GRIMSTONE_ARENA4    = 5444,
+    SAY_GRIMSTONE_ARENA5    = 5445,
+    SAY_GRIMSTONE_ARENA6    = 5446,
+
     SPELL_GRIMSTONE_TELEPORT = 6422,
 };
 
@@ -272,12 +279,12 @@ struct npc_grimstoneAI : public npc_escortAI
         switch (i)
         {
             case 0:
-                DoScriptText(-1000011, m_creature);
+                DoScriptText(SAY_GRIMSTONE_ARENA2, m_creature);
                 CanWalk = false;
                 Event_Timer = 5000;
                 break;
             case 1:
-                DoScriptText(-1000012, m_creature);
+                DoScriptText(SAY_GRIMSTONE_ARENA3, m_creature);
                 CanWalk = false;
                 Event_Timer = 5000;
                 break;
@@ -285,10 +292,10 @@ struct npc_grimstoneAI : public npc_escortAI
                 CanWalk = false;
                 break;
             case 3:
-                //DoScriptText(-1000013, m_creature);//5
+                //DoScriptText(SAY_GRIMSTONE_ARENA4, m_creature);//5
                 break;
             case 4:
-                DoScriptText(-1000015, m_creature);
+                DoScriptText(SAY_GRIMSTONE_ARENA6, m_creature);
                 CanWalk = false;
                 Event_Timer = 5000;
                 break;
@@ -380,7 +387,7 @@ struct npc_grimstoneAI : public npc_escortAI
                 switch (EventPhase)
                 {
                     case 0:
-                        DoScriptText(-1000010, m_creature);
+                        DoScriptText(SAY_GRIMSTONE_ARENA1, m_creature);
                         DoGate(DATA_ARENA4, GO_STATE_READY);
                         Start(false);
                         CanWalk = true;
@@ -422,12 +429,12 @@ struct npc_grimstoneAI : public npc_escortAI
                         SummonRingMob();
                         SummonRingMob();
                         m_creature->SetVisibility(VISIBILITY_ON);
-                        DoScriptText(-1000013, m_creature);
+                        DoScriptText(SAY_GRIMSTONE_ARENA4, m_creature);
                         Event_Timer = 4000;
                         break;
                     case 9:
                         SummonRingMob();
-                        DoScriptText(-1000014, m_creature);
+                        DoScriptText(SAY_GRIMSTONE_ARENA5, m_creature);
                         m_creature->SetVisibility(VISIBILITY_OFF);
                         Event_Timer = 0;
                         break;
