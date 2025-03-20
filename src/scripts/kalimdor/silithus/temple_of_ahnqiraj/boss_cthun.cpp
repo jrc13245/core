@@ -1234,7 +1234,7 @@ struct eye_of_cthunAI : public ScriptedAI
                 target = m_pInstance->GetMap()->GetPlayer(initialPullerGuid);
             }
 
-            if (!target)
+            if (!target || target->IsDead())
             {
                 target = SelectRandomAliveNotStomach(m_pInstance);
             }
