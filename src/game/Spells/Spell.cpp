@@ -7730,8 +7730,10 @@ SpellCastResult Spell::CheckItems()
             if (m_spellInfo->HasAttribute(SPELL_ATTR_EX3_REQUIRES_MAIN_HAND_WEAPON))
                 return SPELL_FAILED_EQUIPPED_ITEM_CLASS_MAINHAND;
 
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_10_2
             if (m_spellInfo->HasAttribute(SPELL_ATTR_EX3_REQUIRES_OFFHAND_WEAPON))
                 return SPELL_FAILED_EQUIPPED_ITEM_CLASS_OFFHAND;
+#endif
 
             return SPELL_FAILED_EQUIPPED_ITEM_CLASS;
 
