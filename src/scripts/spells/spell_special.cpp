@@ -43,7 +43,7 @@ SpellScript* GetScript_Meteor(SpellEntry const*)
 // 24934 - Darkmoon Steam Tonk Control Console
 struct DarkmoonSteamTonkControlConsoleScript : public SpellScript
 {
-    void OnInit(Spell* spell) const final
+    void OnInit(Spell* spell) final
     {
         // Unsummon a potential Hunter or Warlock pet when using the Tonk Control Console.
         // Without this, the player will be unable to summon a Tonk but will still be

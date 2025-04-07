@@ -45,6 +45,38 @@ SpellScript* GetScript_RogueEviscerate(SpellEntry const*)
     return new RogueEviscerateScript();
 }
 
+// 1856, 1857, 27617 - Vanish
+struct RogueVanishScript : SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_1 && spell->GetUnitTarget())
+        {
+            spell->GetUnitTarget()->RemoveSpellsCausingAura(SPELL_AURA_MOD_ROOT);
+            spell->GetUnitTarget()->RemoveSpellsCausingAura(SPELL_AURA_MOD_DECREASE_SPEED);
+
+            // World of Warcraft Client Patch 1.12.0 (2006-08-22)
+            // -  Vanish now removes effects that allow the caster to always remain
+            //    aware of their target(currently Hunter's Mark and Mind Vision).
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
+            spell->GetUnitTarget()->RemoveSpellsCausingAura(SPELL_AURA_MOD_STALKED);
+#endif
+
+            if (Player* pPlayer = spell->GetUnitTarget()->ToPlayer())
+                pPlayer->CastHighestStealthRank();
+
+            return false;
+
+        }
+        return true;
+    }
+};
+
+SpellScript* GetScript_RogueVanish(SpellEntry const*)
+{
+    return new RogueVanishScript();
+}
+
 void AddSC_rogue_spell_scripts()
 {
     Script* newscript;
@@ -52,5 +84,10 @@ void AddSC_rogue_spell_scripts()
     newscript = new Script;
     newscript->Name = "spell_rogue_eviscerate";
     newscript->GetSpellScript = &GetScript_RogueEviscerate;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_rogue_vanish";
+    newscript->GetSpellScript = &GetScript_RogueVanish;
     newscript->RegisterSelf();
 }

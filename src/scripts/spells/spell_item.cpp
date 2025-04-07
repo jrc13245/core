@@ -133,12 +133,120 @@ struct NoggenfoggerElixirScript : public SpellScript
 
             pPlayer->CastSpell(pPlayer, randomSpellId, true, nullptr);
         }
+        return true;
     }
 };
 
 SpellScript* GetScript_NoggenfoggerElixir(SpellEntry const*)
 {
     return new NoggenfoggerElixirScript();
+}
+
+// 15712 - Linken's Boomerang
+struct LinkensBoomerangScript : public SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        // 10% chance to proc stun, 3% chance to proc disarm (dubious numbers)
+        if (effIdx == EFFECT_INDEX_1)
+        {
+            if (urand(0, 30))
+                return false;
+        }
+        else if (effIdx == EFFECT_INDEX_2)
+        {
+            if (urand(0, 10))
+                return false;
+        }
+        return true;
+    }
+};
+
+SpellScript* GetScript_LinkensBoomerang(SpellEntry const*)
+{
+    return new LinkensBoomerangScript();
+}
+
+// 6410 - Food (Scorpid Surprise)
+struct ScorpidSurpriseScript : public SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_1)
+        {
+            // Heals 294 damage over 21 sec, assuming you don't bite down on a poison sac.
+            // 10% proc rate (no source !)
+            if (urand(0, 10))
+                return false;
+        }
+        return true;
+    }
+};
+
+SpellScript* GetScript_ScorpidSurprise(SpellEntry const*)
+{
+    return new ScorpidSurpriseScript();
+}
+
+// 29284 - Brittle Armor (Zandalarian Hero Badge)
+struct BrittleArmorDummyScript : public SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
+        {
+            spell->m_caster->CastSpell(spell->GetUnitTarget(), 24575, true);
+        }
+        return true;
+    }
+};
+
+SpellScript* GetScript_BrittleArmorDummy(SpellEntry const*)
+{
+    return new BrittleArmorDummyScript();
+}
+
+// 29286 - Mercurial Shield (Petrified Scarab)
+struct MercurialShieldDummyScript : public SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
+        {
+            spell->m_caster->CastSpell(spell->GetUnitTarget(), 26464, true);
+        }
+        return true;
+    }
+};
+
+SpellScript* GetScript_MercurialShieldDummy(SpellEntry const*)
+{
+    return new MercurialShieldDummyScript();
+}
+
+// 23442 - Everlook Transporter (Dimensional Ripper - Everlook)
+struct EverlookTransporterScript : public SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0 && spell->m_casterUnit)
+        {
+            int32 r = irand(0, 119);
+            if (r >= 70)                                    // 7/12 success
+            {
+                if (r < 100)                                // 4/12 evil twin
+                    spell->m_casterUnit->CastSpell(spell->m_casterUnit, 23445, true);
+                else                                        // 1/12 fire
+                    spell->m_casterUnit->CastSpell(spell->m_casterUnit, 23449, true);
+            }
+        }
+        return true;
+    }
+};
+
+SpellScript* GetScript_EverlookTransporter(SpellEntry const*)
+{
+    return new EverlookTransporterScript();
 }
 
 void AddSC_item_spell_scripts()
@@ -163,5 +271,30 @@ void AddSC_item_spell_scripts()
     newscript = new Script;
     newscript->Name = "spell_noggenfogger_elixir";
     newscript->GetSpellScript = &GetScript_NoggenfoggerElixir;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_linkens_boomerang";
+    newscript->GetSpellScript = &GetScript_LinkensBoomerang;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_scorpid_surprise";
+    newscript->GetSpellScript = &GetScript_ScorpidSurprise;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_brittle_armor_dummy";
+    newscript->GetSpellScript = &GetScript_BrittleArmorDummy;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_mercurial_shield_dummy";
+    newscript->GetSpellScript = &GetScript_MercurialShieldDummy;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_everlook_transporter";
+    newscript->GetSpellScript = &GetScript_EverlookTransporter;
     newscript->RegisterSelf();
 }

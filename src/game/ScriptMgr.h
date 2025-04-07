@@ -140,7 +140,7 @@ struct SpellScript
     virtual ~SpellScript() = default;
 
     // called on spell init
-    virtual void OnInit(Spell* /*spell*/) const {}
+    virtual void OnInit(Spell* /*spell*/) {}
     // called on success during Spell::Prepare
     virtual void OnSuccessfulStart(Spell* /*spell*/) const {}
     // called on success inside Spell::finish - for channels this only happens if whole channel went through
