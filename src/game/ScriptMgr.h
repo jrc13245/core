@@ -148,7 +148,7 @@ struct SpellScript
     // called at end of Spell::CheckCast - strict is true in Spell::Prepare
     virtual SpellCastResult OnCheckCast(Spell* /*spell*/, bool /*strict*/) const { return SPELL_CAST_OK; }
     // called before effect execution
-    virtual void OnEffectExecute(Spell* /*spell*/, SpellEffectIndex /*effIdx*/) const {}
+    virtual bool OnEffectExecute(Spell* /*spell*/, SpellEffectIndex /*effIdx*/) const { return true; }
     // called in targeting to determine radius for spell
     virtual void OnSetTargetMap(Spell* /*spell*/, SpellEffectIndex /*effIdx*/, uint32& /*targetMode*/, float& /*radius*/, uint32& /*unMaxTargets*/, bool& /*selectClosestTargets*/) const {}
     // called on Unit Spell::CheckTarget

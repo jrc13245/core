@@ -20,7 +20,7 @@
 // 26789 - Shard of the Fallen Star
 struct MeteorScript : public SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0)
         {
@@ -31,6 +31,7 @@ struct MeteorScript : public SpellScript
 
             spell->damage /= count; // divide to all targets
         }
+        return true;
     }
 };
 
@@ -60,12 +61,13 @@ SpellScript* GetScript_DarkmoonSteamTonkControlConsole(SpellEntry const*)
 // 24933 - Cannon (Darkmoon Steam Tonk)
 struct DarkmoonSteamTonkCannonScript : public SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
         {
             spell->m_caster->CastSpell(spell->GetUnitTarget(), 27766, true);
         }
+        return true;
     }
 };
 

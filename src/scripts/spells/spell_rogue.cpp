@@ -19,7 +19,7 @@
 // 2098, 6760, 6761, 6762, 8623, 8624, 11299, 11300, 31016 - Eviscerate
 struct RogueEviscerateScript : SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
         {
@@ -36,6 +36,7 @@ struct RogueEviscerateScript : SpellScript
             }
 #endif
         }
+        return true;
     }
 };
 

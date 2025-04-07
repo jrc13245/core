@@ -19,7 +19,7 @@
 // 18788 - Demonic Sacrifice
 struct WarlockDemonicSacrificeScript : SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0 && spell->m_casterUnit && spell->GetUnitTarget())
         {
@@ -41,11 +41,12 @@ struct WarlockDemonicSacrificeScript : SpellScript
                     break;               // succubus
                 default:
                     sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Demonic Sacrifice: Unhandled creature entry (%u) case.", entry);
-                    return;
+                    return true;
             }
 
             spell->m_casterUnit->CastSpell(spell->m_casterUnit, spellId, true);
         }
+        return true;
     }
 };
 
@@ -57,7 +58,7 @@ SpellScript* GetScript_WarlockDemonicSacrifice(SpellEntry const*)
 // 17962, 18930, 18931, 18932 - Conflagrate
 struct WarlockConflagrateScript : SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
         {
@@ -74,6 +75,7 @@ struct WarlockConflagrateScript : SpellScript
                 }
             }
         }
+        return true;
     }
 };
 
@@ -85,7 +87,7 @@ SpellScript* GetScript_WarlockConflagrate(SpellEntry const*)
 // 1454, 1455, 1456, 11687, 11688, 11689 - Life Tap
 struct WarlockLifeTapScript : SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0 && spell->m_casterUnit)
         {
@@ -117,6 +119,7 @@ struct WarlockLifeTapScript : SpellScript
             else
                 spell->SendCastResult(SPELL_FAILED_FIZZLE);
         }
+        return true;
     }
 };
 
@@ -128,7 +131,7 @@ SpellScript* GetScript_WarlockLifeTap(SpellEntry const*)
 // 18280 - Curse of Agony Dummy
 struct WarlockCurseOfAgonyDummyScript : SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_10_2
         if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
@@ -146,6 +149,7 @@ struct WarlockCurseOfAgonyDummyScript : SpellScript
             }
         }
 #endif
+        return true;
     }
 };
 

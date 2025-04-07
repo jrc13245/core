@@ -36,16 +36,13 @@ SpellScript* GetScript_HeavyArmorKit(SpellEntry const*)
 // 8063 - Deviate Fish
 struct DeviateFishScript : public SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0)
         {
-            if (!spell->GetCaster())
-                return;
-
             Player* pPlayer = spell->GetCaster()->ToPlayer();
             if (!pPlayer)
-                return;
+                return false;
 
             uint32 randomSpellId = PickRandomValue(
                 8064u, // Sleepy
@@ -58,6 +55,7 @@ struct DeviateFishScript : public SpellScript
 
             pPlayer->CastSpell(pPlayer, randomSpellId, true, nullptr);
         }
+        return true;
     }
 };
 
@@ -69,16 +67,13 @@ SpellScript* GetScript_DeviateFish(SpellEntry const*)
 // 8213 - Cooked Deviate Fish
 struct CookedDeviateFishScript : public SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0)
         {
-            if (!spell->GetCaster())
-                return;
-
             Player* pPlayer = spell->GetCaster()->ToPlayer();
             if (!pPlayer)
-                return;
+                return false;
 
             uint32 randomSpellId = 0;
             uint32 spells[6] = {
@@ -98,6 +93,7 @@ struct CookedDeviateFishScript : public SpellScript
 #endif
             pPlayer->CastSpell(pPlayer, randomSpellId, true, nullptr);
         }
+        return true;
     }
 };
 
@@ -109,16 +105,13 @@ SpellScript* GetScript_CookedDeviateFish(SpellEntry const*)
 // 16589 - Noggenfogger Elixir
 struct NoggenfoggerElixirScript : public SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0)
         {
-            if (!spell->GetCaster())
-                return;
-
             Player* pPlayer = spell->GetCaster()->ToPlayer();
             if (!pPlayer)
-                return;
+                return false;
 
             // https://old.reddit.com/r/classicwow/comments/jwycmc/noggenfogger_1000_consumes_593_skellies_210_minis/
             uint32 randomSpellId = 16591; // skeleton (60%)
