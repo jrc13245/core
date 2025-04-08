@@ -5296,30 +5296,6 @@ void Spell::EffectResurrect(SpellEffectIndex effIdx)
     if (!unitTarget->IsInWorld())
         return;
 
-    switch (m_spellInfo->Id)
-    {
-        // Defibrillate (Goblin Jumper Cables) have 33% chance on success
-        case 8342:
-            if (roll_chance_i(67))
-            {
-                if (m_casterUnit)
-                    m_casterUnit->CastSpell(m_casterUnit, 8338, true, m_CastItem);
-                return;
-            }
-            break;
-        // Defibrillate (Goblin Jumper Cables XL) have 50% chance on success
-        case 22999:
-            if (roll_chance_i(50))
-            {
-                if (m_casterUnit)
-                    m_casterUnit->CastSpell(m_casterUnit, 23055, true, m_CastItem);
-                return;
-            }
-            break;
-        default:
-            break;
-    }
-
     Player* pTarget = ((Player*)unitTarget);
 
     if (pTarget->IsRessurectRequested())      // already have one active request
@@ -5342,15 +5318,16 @@ void Spell::EffectAddExtraAttacks(SpellEffectIndex effIdx)
     if (!unitTarget->IsAlive() || unitTarget->IsExtraAttacksLocked())
         return;
 
-    if (m_spellInfo->Id == 20178) // Reckoning
-    {
-        if (unitTarget->GetExtraAttacks() < 4)
-            unitTarget->AddExtraAttack();
-        return;
-    }
-
     if (unitTarget->GetExtraAttacks())
         return;
+
+    // World of Warcraft Client Patch 1.3.0 (2005-03-22)
+    // - Fixed a bug where abilities that give extra attacks, like the paladin
+    //   Reckoning talent, could cause the following swing to take longer than
+    //   it should.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_2_4
+    unitTarget->ResetAttackTimer();
+#endif
 
     unitTarget->AddExtraAttackOnUpdate();
     unitTarget->SetExtraAttaks(damage);
@@ -5580,43 +5557,11 @@ void Spell::EffectPlayerPull(SpellEffectIndex effIdx)
     if (!unitTarget)
         return;
 
-    switch (m_spellInfo->Id)
-    {
-        case 28337: // thaddius Magnetic Pull
-        {
-            float speedXY = float(m_spellInfo->EffectMiscValue[effIdx]) * 0.1f;
-            float speedZ = unitTarget->GetDistance(m_caster) / speedXY * 0.5f * 20.0f;
-            unitTarget->KnockBackFrom(m_caster, -speedXY, speedZ);
-            break;
-        }
-        case 28434: // Spider Web
-        {
-            // see boss_maexxnaAI::DoCastWebWrap() for some info on this rather weird implementation
-            float dx = unitTarget->GetPositionX() - m_caster->GetPositionX();
-            float dy = unitTarget->GetPositionY() - m_caster->GetPositionY();
-            float dist = sqrt((dx * dx) + (dy * dy));
-            float yDist = m_caster->GetPositionZ() - unitTarget->GetPositionZ();
-            float horizontalSpeed = dist / 1.5f;
-            float verticalSpeed = 12.0f + (yDist*0.5f);
-            float angle = unitTarget->GetAngle(m_caster->GetPositionX(), m_caster->GetPositionY());
-
-            // set immune anticheat and calculate speed
-            if (Player* plr = unitTarget->ToPlayer())
-                plr->SetLaunched(true);
-
-            unitTarget->KnockBack(angle, horizontalSpeed, verticalSpeed);
-            break;
-        }
-        default:
-        {
-            // Todo: this implementation seems very wrong. Gives terrible results for maexxna web-wrap and
-            // thaddius magnetic pull
-            float dist = unitTarget->GetDistance2d(m_caster);
-            if (damage && dist > damage)
-                dist = damage;
-            unitTarget->KnockBackFrom(m_caster, -dist, float(m_spellInfo->EffectMiscValue[effIdx]) / 10);
-        }
-    }
+    // Todo: this implementation seems very wrong. Gives terrible results for maexxna web-wrap and thaddius magnetic pull
+    float dist = unitTarget->GetDistance2d(m_caster);
+    if (damage && dist > damage)
+        dist = damage;
+    unitTarget->KnockBackFrom(m_caster, -dist, float(m_spellInfo->EffectMiscValue[effIdx]) / 10);
 }
 
 void Spell::EffectDispelMechanic(SpellEffectIndex effIdx)
@@ -5926,20 +5871,6 @@ void Spell::EffectSummonDemon(SpellEffectIndex effIdx)
 
     // might not always work correctly, maybe the creature that dies from CoD casts the effect on itself and is therefore the caster?
     pSummon->SetLevel(m_caster->GetLevel());
-
-    // TODO: Add damage/mana/hp according to level
-
-    if (m_spellInfo->EffectMiscValue[effIdx] == 89)        // Inferno summon
-    {
-        // Enslave demon effect, without mana cost and cooldown
-        m_caster->CastSpell(pSummon, 20882, true);          // FIXME: enslave does not scale with level, level 62+ minions cannot be enslaved
-
-        // Short root spell on infernal from sniffs
-        pSummon->CastSpell(pSummon, 22707, true);
-
-        // Inferno effect
-        pSummon->CastSpell(pSummon, 22703, true);
-    }
 
     AddExecuteLogInfo(effIdx, ExecuteLogInfo(pSummon->GetObjectGuid()));
 
