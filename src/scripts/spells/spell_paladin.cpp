@@ -177,7 +177,7 @@ struct PaladinReckoningScript : SpellScript
             //   Reckoning talent, could cause the following swing to take longer than
             //   it should.
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_2_4
-            unitTarget->ResetAttackTimer();
+            spell->GetUnitTarget()->ResetAttackTimer();
 #endif
 
             // It was possible to stack infinite extra attacks in early vanilla.
