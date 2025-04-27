@@ -256,7 +256,10 @@ void Creature::RemoveFromWorld()
     if (IsInWorld())
     {
         if (GetUInt32Value(UNIT_CREATED_BY_SPELL))
+        {
             StartCooldownForSummoner();
+            CancelSummonPossessedCharm();
+        }
         if (AI())
             AI()->OnRemoveFromWorld();
         if (GetObjectGuid().GetHigh() == HIGHGUID_UNIT)
@@ -2203,7 +2206,10 @@ void Creature::SetDeathState(DeathState s)
         }
 
         if (GetUInt32Value(UNIT_CREATED_BY_SPELL))
+        {
             StartCooldownForSummoner();
+            CancelSummonPossessedCharm();
+        }
 
         // return, since we promote to CORPSE_FALLING. CORPSE_FALLING is promoted to CORPSE at next update.
         if (!HasCreatureState(CSTATE_DESPAWNING) && CanFly() && FallGround())
@@ -4305,6 +4311,23 @@ void Creature::StartCooldownForSummoner()
                 {
                     AddCreatureState(CSTATE_IMPOSED_COOLDOWN);
                     pOwner->AddCooldown(*pSpellInfo); // Remove infinity cooldown
+                }
+            }
+        }
+    }
+}
+
+void Creature::CancelSummonPossessedCharm()
+{
+    if (HasUnitState(UNIT_STATE_POSSESSED))
+    {
+        if (SpellEntry const* pSpellInfo = sSpellMgr.GetSpellEntry(GetUInt32Value(UNIT_CREATED_BY_SPELL)))
+        {
+            if (pSpellInfo->HasEffect(SPELL_EFFECT_SUMMON_POSSESSED))
+            {
+                if (Unit* pOwner = GetCharmer())
+                {
+                    pOwner->RemoveAurasDueToSpell(GetUInt32Value(UNIT_CREATED_BY_SPELL));
                 }
             }
         }
