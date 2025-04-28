@@ -30,9 +30,6 @@ UPDATE `characters` SET `character_flags`=(`character_flags` | 0x00000400) WHERE
 UPDATE `characters` SET `character_flags`=(`character_flags` | 0x00000800) WHERE `player_flags` & 0x00000800;
 
 ALTER TABLE `characters`
-	ADD COLUMN `character_flags` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `player_flags`;
-
-ALTER TABLE `characters`
 	DROP COLUMN `player_flags`;
   
 ALTER TABLE `characters`
@@ -40,7 +37,6 @@ ALTER TABLE `characters`
 
 ALTER TABLE `characters`
 	DROP COLUMN `is_logout_resting`;
-
 
 
 -- End of migration.

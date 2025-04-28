@@ -306,10 +306,6 @@ enum CharacterFlags
     CHARACTER_FLAG_ON_UNSAFE_TRANSPORT                          = 0x00080000, // On unsafe transport (port to safe loc on log in)
     CHARACTER_FLAG_RENAME_FAILED                                = 0x00100000, // Player unable to rename character
     CHARACTER_FLAG_MOUNT_UPGRADED                               = 0x00200000, // Mount has been upgraded
-    CHARACTER_FLAG_FRIENDS_LIST_NEEDS_REPAIR                    = 0x00400000, // Friends list requires a repair
-    CHARACTER_FLAG_EXPLORATION_DATA_FIXED                       = 0x00800000, // character had their exploration data fixed
-    CHARACTER_FLAG_LOCKED_BY_BILLING                            = 0x01000000, // Locked due to billing
-    CHARACTER_FLAG_DECLINED                                     = 0x02000000, // Player has Russian declined name forms
 };
 
 enum PlayerFlags
