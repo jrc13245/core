@@ -544,9 +544,9 @@ bool ChatHandler::HandleCheatWallclimbCommand(char* args)
         return false;
 
     if (value)
-        player->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_0);
+        player->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SERVER_CONTROLLED);
     else
-        player->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_0);
+        player->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SERVER_CONTROLLED);
 
     PSendSysMessage(LANG_YOU_SET_WALLCLIMB, value ? "on" : "off", GetNameLink(player).c_str());
     if (needReportToTarget(player))
@@ -617,7 +617,7 @@ bool ChatHandler::HandleCheatStatusCommand(char* args)
         SendSysMessage("- Untargetable");
     if (target->HasMovementFlag(MOVEFLAG_WATERWALKING) && !target->HasAuraType(SPELL_AURA_WATER_WALK))
         SendSysMessage("- Water walking");
-    if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_0))
+    if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SERVER_CONTROLLED))
         SendSysMessage("- Wall climbing");
     if (target->HasCheatOption(PLAYER_CHEAT_DEBUG_TARGET_INFO))
         SendSysMessage("- Debug target info");
