@@ -3638,13 +3638,13 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
                 case 20114: // BM Only OFF
                 {
                     if (Player* pPlayer = ToPlayer(m_caster))
-                        pPlayer->SetCheatGod(false, true);
+                        pPlayer->SetCheatBeastmaster(false, true);
                     return;
                 }
                 case 20115: // BM Only ON
                 {
                     if (Player* pPlayer = ToPlayer(m_caster))
-                        pPlayer->SetCheatGod(true, true);
+                        pPlayer->SetCheatBeastmaster(true, true);
                     return;
                 }
                 case 29313: // CooldownAll
