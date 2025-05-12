@@ -126,6 +126,7 @@ class ChaseMovementGenerator : public TargetedMovementGeneratorMedium<T, ChaseMo
         using TargetedMovementGeneratorMedium<T, ChaseMovementGenerator<T> >::m_bTargetOnTransport;
         using TargetedMovementGeneratorMedium<T, ChaseMovementGenerator<T> >::m_bRecalculateTravel;
         using TargetedMovementGeneratorMedium<T, ChaseMovementGenerator<T> >::m_bTargetReached;
+        using TargetedMovementGeneratorMedium<T, ChaseMovementGenerator<T> >::m_bReachable;
 };
 
 template<class T>
@@ -167,6 +168,7 @@ class FollowMovementGenerator : public TargetedMovementGeneratorMedium<T, Follow
         using TargetedMovementGeneratorMedium<T, FollowMovementGenerator<T> >::m_bTargetOnTransport;
         using TargetedMovementGeneratorMedium<T, FollowMovementGenerator<T> >::m_bRecalculateTravel;
         using TargetedMovementGeneratorMedium<T, FollowMovementGenerator<T> >::m_bTargetReached;
+        using TargetedMovementGeneratorMedium<T, FollowMovementGenerator<T> >::m_bReachable;
 };
 
 #endif
