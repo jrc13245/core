@@ -112,10 +112,23 @@ void ChaseMovementGenerator<T>::_setTargetLocation(T &owner)
     {
         if (owner.CanReachWithMeleeAutoAttack(i_target.getTarget()))
         {
-            losResult = owner.IsWithinLOSInMap(i_target.getTarget());
-            losChecked = true;
-            if (losResult)
-                return;
+            bool futureOkay = true;
+
+            if (i_target->IsMoving())
+            {
+                Position futurePos;
+                if (i_target->ExtrapolateMovement(i_target->m_movementInfo, 200, futurePos.x, futurePos.y, futurePos.z, futurePos.o))
+                    if (!i_target->CanReachWithMeleeAutoAttackAtPosition(&owner, futurePos.x, futurePos.y, futurePos.z))
+                        futureOkay = false;
+            }
+
+            if (futureOkay)
+            {
+                losResult = owner.IsWithinLOSInMap(i_target.getTarget());
+                losChecked = true;
+                if (losResult)
+                    return;
+            }
         }
 
         // Avoid collisions between mobs.
@@ -884,10 +897,6 @@ void FollowMovementGenerator<Creature>::MovementInform(Creature& unit)
 }
 
 //-----------------------------------------------//
-template void TargetedMovementGeneratorMedium<Player, ChaseMovementGenerator<Player> >::_setTargetLocation(Player &);
-template void TargetedMovementGeneratorMedium<Player, FollowMovementGenerator<Player> >::_setTargetLocation(Player &);
-template void TargetedMovementGeneratorMedium<Creature, ChaseMovementGenerator<Creature> >::_setTargetLocation(Creature &);
-template void TargetedMovementGeneratorMedium<Creature, FollowMovementGenerator<Creature> >::_setTargetLocation(Creature &);
 template void TargetedMovementGeneratorMedium<Player, ChaseMovementGenerator<Player> >::UpdateAsync(Player &, uint32);
 template void TargetedMovementGeneratorMedium<Player, FollowMovementGenerator<Player> >::UpdateAsync(Player &, uint32);
 template void TargetedMovementGeneratorMedium<Creature, ChaseMovementGenerator<Creature> >::UpdateAsync(Creature &, uint32);
