@@ -127,7 +127,7 @@ void ChaseMovementGenerator<T>::_setTargetLocation(T &owner)
         }
     }
     // prevent redundant micro-movement for pets, other followers.
-    else if (!i_target->IsMoving() && owner.movespline->Finalized() && !IsFarEnoughToMoveStationaryFollower(owner))
+    else if (!i_target->IsMoving() && owner.movespline->Finalized() && !this->IsFarEnoughToMoveStationaryFollower(owner))
     {
         return;
     }
@@ -592,7 +592,7 @@ void FollowMovementGenerator<T>::_setTargetLocation(T &owner)
 
 
     // prevent redundant micro-movement for pets, other followers.
-    if (!i_target->IsMoving() && owner.movespline->Finalized() && !IsFarEnoughToMoveStationaryFollower(owner))
+    if (!i_target->IsMoving() && owner.movespline->Finalized() && !this->IsFarEnoughToMoveStationaryFollower(owner))
         return;
 
     // to at m_fOffset distance from target and m_fAngle from target facing
