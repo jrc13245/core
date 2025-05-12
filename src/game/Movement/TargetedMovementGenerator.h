@@ -62,7 +62,7 @@ class TargetedMovementGeneratorMedium
         bool IsFarEnoughToMoveStationaryFollower(T&) const;
 
     protected:
-        void _setTargetLocation(T &);
+        virtual void _setTargetLocation(T &) = 0;
 
         ShortTimeTracker m_checkDistanceTimer;
 
@@ -109,6 +109,7 @@ class ChaseMovementGenerator : public TargetedMovementGeneratorMedium<T, ChaseMo
         bool m_bCanSpread = true;
         uint8 m_uiSpreadAttempts = 0;
 
+        void _setTargetLocation(T &) final;
         void DoBackMovement(T &, Unit* target);
         void DoSpreadIfNeeded(T &, Unit* target);
         bool TargetDeepInBounds(T &, Unit* target) const;
@@ -153,6 +154,7 @@ class FollowMovementGenerator : public TargetedMovementGeneratorMedium<T, Follow
         void _reachTarget(T &) {}
     private:
         void _updateSpeed(T &u);
+        void _setTargetLocation(T &) final;
 
         // Needed to compile with gcc for some reason.
         using TargetedMovementGeneratorMedium<T, FollowMovementGenerator<T> >::i_target;
