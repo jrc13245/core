@@ -13160,7 +13160,7 @@ void Player::RewardQuest(Quest const* pQuest, uint32 reward, WorldObject* questE
     q_status.m_reward_choice = pQuest->RewChoiceItemId[reward];
 
     // Used for client inform but rewarded only in case not max level
-    uint32 xp = uint32(pQuest->XPValue(this) * sWorld.getConfig(CONFIG_FLOAT_RATE_XP_QUEST));
+    uint32 xp = uint32(pQuest->XPValue(GetLevel()) * sWorld.getConfig(CONFIG_FLOAT_RATE_XP_QUEST));
 
     if (GetLevel() < sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
         GiveXP(xp , nullptr);
@@ -16445,7 +16445,7 @@ void Player::SaveToDB(bool online, bool force)
         uberInsert.addFloat(finiteAlways(GetPositionX()));
         uberInsert.addFloat(finiteAlways(GetPositionY()));
         uberInsert.addFloat(finiteAlways(GetPositionZ()));
-        uberInsert.addFloat(MapManager::NormalizeOrientation(finiteAlways(GetOrientation())));
+        uberInsert.addFloat(Geometry::NormalizeOrientation(finiteAlways(GetOrientation())));
     }
     else
     {
@@ -16454,7 +16454,7 @@ void Player::SaveToDB(bool online, bool force)
         uberInsert.addFloat(finiteAlways(GetTeleportDest().x));
         uberInsert.addFloat(finiteAlways(GetTeleportDest().y));
         uberInsert.addFloat(finiteAlways(GetTeleportDest().z));
-        uberInsert.addFloat(MapManager::NormalizeOrientation(finiteAlways(GetTeleportDest().o)));
+        uberInsert.addFloat(Geometry::NormalizeOrientation(finiteAlways(GetTeleportDest().o)));
     }
 
     if (m_transport)
@@ -16464,7 +16464,7 @@ void Player::SaveToDB(bool online, bool force)
     uberInsert.addFloat(finiteAlways(m_movementInfo.GetTransportPos().x));
     uberInsert.addFloat(finiteAlways(m_movementInfo.GetTransportPos().y));
     uberInsert.addFloat(finiteAlways(m_movementInfo.GetTransportPos().z));
-    uberInsert.addFloat(MapManager::NormalizeOrientation(finiteAlways(m_movementInfo.GetTransportPos().o)));
+    uberInsert.addFloat(Geometry::NormalizeOrientation(finiteAlways(m_movementInfo.GetTransportPos().o)));
 
     std::ostringstream ss;
     ss << m_taxi;                                   // string with TaxiMaskSize numbers
