@@ -37,7 +37,6 @@
 #include "SocialMgr.h"
 #include "Util.h"
 #include "Language.h"
-#include "Chat.h"
 #include "Anticheat.h"
 #include "MasterPlayer.h"
 #include "PlayerBroadcaster.h"
@@ -570,7 +569,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         {
             if (nextpos != pos)
             {
-                ChatHandler(pCurrChar).PSendSysMessage(str_motd.substr(pos, nextpos - pos).c_str());
+                pCurrChar->PSendSysMessage(str_motd.substr(pos, nextpos - pos).c_str());
                 ++linecount;
             }
             pos = nextpos + 1;
@@ -578,7 +577,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
 
         if (pos < str_motd.length())
         {
-            ChatHandler(pCurrChar).PSendSysMessage(str_motd.substr(pos).c_str());
+            pCurrChar->PSendSysMessage(str_motd.substr(pos).c_str());
             ++linecount;
         }
     }
@@ -596,7 +595,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
 
     if (char const* warning = sAccountMgr.GetWarningText(GetAccountId()))
     {
-        ChatHandler(pCurrChar).PSendSysMessage(LANG_ACCOUNT_WARNED, warning);
+        pCurrChar->PSendSysMessage(LANG_ACCOUNT_WARNED, warning);
         SendNotification("WARNING: %s", warning);
     }
 

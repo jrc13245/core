@@ -2614,7 +2614,7 @@ void Player::SetGMChat(bool on, bool notify)
         m_ExtraFlags |= PLAYER_EXTRA_GM_CHAT;
         if (notify)
         {
-            ChatHandler(this).SendSysMessage(LANG_GM_CHAT_ON);
+            SendSysMessage(LANG_GM_CHAT_ON);
             GetSession()->SendNotification(LANG_GM_CHAT_ON);
         }
     }
@@ -2623,7 +2623,7 @@ void Player::SetGMChat(bool on, bool notify)
         m_ExtraFlags &= ~PLAYER_EXTRA_GM_CHAT;
         if (notify)
         {
-            ChatHandler(this).SendSysMessage(LANG_GM_CHAT_OFF);
+            SendSysMessage(LANG_GM_CHAT_OFF);
             GetSession()->SendNotification(LANG_GM_CHAT_OFF);
         }
     }
@@ -2649,7 +2649,7 @@ void Player::SetGameMaster(bool on, bool notify)
 
         if (notify)
         {
-            ChatHandler(this).SendSysMessage(LANG_GM_ON);
+            SendSysMessage(LANG_GM_ON);
             GetSession()->SendNotification(LANG_GM_ON);
         }
     }
@@ -2674,7 +2674,7 @@ void Player::SetGameMaster(bool on, bool notify)
 
         if (notify)
         {
-            ChatHandler(this).SendSysMessage(LANG_GM_OFF);
+            SendSysMessage(LANG_GM_OFF);
             GetSession()->SendNotification(LANG_GM_OFF);
         }
     }
@@ -2712,7 +2712,7 @@ void Player::SetGMVisible(bool on, bool notify)
 
         if (notify)
         {
-            ChatHandler(this).SendSysMessage(LANG_INVISIBLE_VISIBLE);
+            SendSysMessage(LANG_INVISIBLE_VISIBLE);
             GetSession()->SendNotification(LANG_INVIS_OFF);
         }
     }
@@ -2730,7 +2730,7 @@ void Player::SetGMVisible(bool on, bool notify)
 
         if (notify)
         {
-            ChatHandler(this).PSendSysMessage(LANG_INVISIBLE_INVISIBLE, GetGMInvisibilityLevel());
+            PSendSysMessage(LANG_INVISIBLE_INVISIBLE, GetGMInvisibilityLevel());
             GetSession()->SendNotification(LANG_INVIS_ON);
         }
     }
@@ -17135,7 +17135,7 @@ void Player::SendFactionAtWar(uint32 reputationId, bool apply) const
 
 void Player::SendResetFailedNotify()
 {
-    ChatHandler(this).SendSysMessage(LANG_LEAVE_TO_RESET_INSTANCE);
+    SendSysMessage(LANG_LEAVE_TO_RESET_INSTANCE);
 }
 
 // Reset all solo instances and optionally send a message on success for each
@@ -17377,11 +17377,27 @@ void Player::TextEmote(char const* text) const
     SendMessageToSetInRange(&data, sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_TEXTEMOTE), true, !sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_CHAT));
 }
 
+void Player::SendSysMessage(int32 entry) const
+{
+    SendSysMessage(m_session->GetMangosString(entry));
+}
+
 void Player::SendSysMessage(char const* str) const
 {
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, str);
     m_session->SendPacket(&data);
+}
+
+void Player::PSendSysMessage(int32 entry, ...) const
+{
+    char const* format = m_session->GetMangosString(entry);
+    va_list ap;
+    char str[2048];
+    va_start(ap, entry);
+    vsnprintf(str, 2048, format, ap);
+    va_end(ap);
+    SendSysMessage(str);
 }
 
 void Player::PSendSysMessage(char const* format, ...) const
@@ -21660,7 +21676,7 @@ Item* Player::AddItem(uint32 itemId, uint32 count)
     if (count == 0 || dest.empty())
     {
         // -- TODO: Send to mailbox if no space
-        ChatHandler(this).PSendSysMessage("You don't have any space in your bags.");
+        PSendSysMessage("You don't have any space in your bags.");
         return nullptr;
     }
 

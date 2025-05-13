@@ -725,19 +725,19 @@ void ChatHandler::HandleInstanceUnbindHelper(Player* player, bool got_map, uint3
 
             if (MapEntry const* entry = sMapStorage.LookupEntry<MapEntry>(itr->first))
             {
-                ChatHandler(player).PSendSysMessage("unbinding map: %d (%s) inst: %d perm: %s canReset: %s TTR: %s",
+                player->PSendSysMessage("unbinding map: %d (%s) inst: %d perm: %s canReset: %s TTR: %s",
                     itr->first, entry->name, save->GetInstanceId(), itr->second.perm ? "yes" : "no",
                     save->CanReset() ? "yes" : "no", timeleft.c_str());
             }
             else
-                ChatHandler(player).PSendSysMessage("bound for a nonexistent map %u", itr->first);
+                player->PSendSysMessage("bound for a nonexistent map %u", itr->first);
             player->UnbindInstance(itr);
             counter++;
         }
         else
             ++itr;
     }
-    ChatHandler(player).PSendSysMessage("instances unbound: %d", counter);
+    player->PSendSysMessage("instances unbound: %d", counter);
 }
 
 bool ChatHandler::HandleInstanceUnbindCommand(char* args)
