@@ -12713,7 +12713,12 @@ bool Player::CanRewardQuest(Quest const* pQuest, bool msg) const
     if (pQuest->IsAutoComplete())
     {
         if (!CanTakeQuest(pQuest, false, true))
-            return false;
+        {
+            if (IsGameMaster())
+                PSendSysMessage("Bypassing turn in check for auto completed quest %u due to GM mode.", pQuest->GetQuestId());
+            else
+                return false;
+        }
     }
     else
     {
@@ -17370,6 +17375,23 @@ void Player::TextEmote(char const* text) const
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, text, LANG_UNIVERSAL, GetChatTag(), GetObjectGuid(), GetName());
     SendMessageToSetInRange(&data, sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_TEXTEMOTE), true, !sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_CHAT));
+}
+
+void Player::SendSysMessage(char const* str) const
+{
+    WorldPacket data;
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, str);
+    m_session->SendPacket(&data);
+}
+
+void Player::PSendSysMessage(char const* format, ...) const
+{
+    va_list ap;
+    char str[2048];
+    va_start(ap, format);
+    vsnprintf(str, 2048, format, ap);
+    va_end(ap);
+    SendSysMessage(str);
 }
 
 void Player::PetSpellInitialize()
