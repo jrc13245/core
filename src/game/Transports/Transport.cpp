@@ -30,6 +30,7 @@
 #include "CellImpl.h"
 #include "GameObjectModel.h"
 #include "ObjectAccessor.h"
+#include "MapManager.h"
 
 #include <G3D/Quat.h>
 

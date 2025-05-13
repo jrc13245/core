@@ -22,6 +22,7 @@
 #include "ObjectAccessor.h"
 #include "Language.h"
 #include "ObjectMgr.h"
+#include "MapManager.h"
 #include "Util.h"
 
 bool ChatHandler::HandleTeleCommand(char* args)

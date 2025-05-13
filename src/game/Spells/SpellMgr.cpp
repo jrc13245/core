@@ -27,9 +27,8 @@
 #include "World.h"
 #include "Spell.h"
 #include "ScriptMgr.h"
-#include "BattleGroundMgr.h"
-#include "MapManager.h"
 #include "Unit.h"
+#include "BattleGround.h"
 
 using namespace Spells;
 

@@ -41,6 +41,7 @@
 #include "MasterPlayer.h"
 #include "PlayerBroadcaster.h"
 #include "PlayerBotMgr.h"
+#include "MapManager.h"
 #include "AccountMgr.h"
 
 class LoginQueryHolder : public SqlQueryHolder

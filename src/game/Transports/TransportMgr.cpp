@@ -21,6 +21,10 @@
 #include "Transport.h"
 #include "Geometry.h"
 #include "MoveMap.h"
+#include "SQLStorages.h"
+#include "MoveSplineInitArgs.h"
+#include "Map.h"
+#include "MapManager.h"
 
 INSTANTIATE_SINGLETON_1(TransportMgr);
 
