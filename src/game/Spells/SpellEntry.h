@@ -1071,7 +1071,7 @@ class SpellEntry
 
         bool CanTriggerWeaponProcs() const
         {
-            // // All weapon based abilities can trigger weapon procs,
+            // All weapon based abilities can trigger weapon procs,
             // even if they do no damage, or break on damage, like Sap.
             // https://www.youtube.com/watch?v=klMsyF_Kz5o
             if (EquippedItemClass == ITEM_CLASS_WEAPON && rangeIndex == SPELL_RANGE_IDX_COMBAT)
