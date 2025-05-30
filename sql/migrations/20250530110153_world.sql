@@ -29,7 +29,7 @@ INSERT INTO `transports` (`entry`, `build`, `name`, `period`) VALUES
 (176495, 0, 'Grom\'Gol Base Camp and Undercity', 333044),
 (177233, 0, 'Forgotton Coast and Feathermoon Stronghold', 299437),
 (177233, 5464, 'Forgotton Coast and Feathermoon Stronghold', 317040),
-(181056, 5464, 'Naxxramas', 1208095);
+(181056, 5464, 'Naxxramas', 1208014);
 
 
 -- End of migration.
