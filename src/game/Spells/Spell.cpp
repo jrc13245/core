@@ -4370,7 +4370,7 @@ void Spell::update(uint32 difftime)
                     }
                 }
 
-                if (m_caster->IsPlayer() && (m_spellInfo->Id != 24322) && (m_spellInfo->Id != 24323))
+                if (m_caster->IsPlayer())
                 {
                     // check if player has jumped before the channeling finished
                     if (((Player*)m_caster)->m_movementInfo.HasMovementFlag(MOVEFLAG_JUMPING))
