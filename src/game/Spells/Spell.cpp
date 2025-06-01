@@ -4360,7 +4360,7 @@ void Spell::update(uint32 difftime)
                 if (m_caster->IsPlayer() || m_caster->IsPet())
                 {
                     // check for incapacitating player states
-                    if (m_casterUnit->HasUnitState(UNIT_STATE_CAN_NOT_REACT))
+                    if (m_casterUnit->HasUnitState(UNIT_STATE_CAN_NOT_REACT) && !m_spellInfo->IsIgnoringCasterAndTargetRestrictions())
                     {
                         if (m_casterUnit->HasUnitState(UNIT_STATE_FEIGN_DEATH) ||
                            (m_casterUnit->HasUnitState(UNIT_STATE_STUNNED) && !(m_channeled && m_spellInfo->HasAura(SPELL_AURA_MOD_STUN))) ||
