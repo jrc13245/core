@@ -195,6 +195,12 @@ BindIP = "0.0.0.0"
 #        Default: 1 (true)
 #                 0 (false)
 #
+#    vmap.enableM2LOS
+#        Enable/Disable VMaps support for line of sight and height calculation with M2 objects such as trees
+#        You need to extract the VMaps in order to enable those options
+#        Default: 0 (false)
+#                 1 (true)
+#
 #    vmap.enableIndoorCheck
 #        Enable/Disable VMap based indoor check to remove outdoor-only auras (mounts etc.).
 #        Requires VMaps enabled to work.
@@ -272,6 +278,7 @@ PlayerSave.Stats.SaveOnlyOnLogout = 1
 Terrain.Preload.Continents = 0
 Terrain.Preload.Instances  = 0
 vmap.enableLOS = 1
+vmap.enableM2LOS = 1
 vmap.enableHeight = 1
 vmap.enableIndoorCheck = 1
 mmap.enabled = 1

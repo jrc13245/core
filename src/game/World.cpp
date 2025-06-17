@@ -934,6 +934,7 @@ void World::LoadConfigSettings(bool reload)
 
     setConfig(CONFIG_BOOL_VMAP_INDOOR_CHECK, "vmap.enableIndoorCheck", true);
     bool enableLOS = sConfig.GetBoolDefault("vmap.enableLOS", false);
+    setConfig(CONFIG_BOOL_VMAP_M2_LOS, "vmap.enableM2LOS", false);
     bool enableHeight = sConfig.GetBoolDefault("vmap.enableHeight", false);
     bool disableModelUnload = sConfig.GetBoolDefault("Collision.Models.Unload", false);
 
