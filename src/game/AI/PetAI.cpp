@@ -84,11 +84,7 @@ bool PetAI::_needToStop() const
         }
     }
 
-    bool isVisible = false;
-    // Prevent creature pets from chasing target that is not visible for owner
-    if (pOwner)
-        isVisible = !m_creature->GetVictim()->IsVisibleForOrDetect(pOwner, pOwner, false);
-    return !m_creature->IsValidAttackTarget(m_creature->GetVictim()) || isVisible;
+    return !m_creature->IsValidAttackTarget(m_creature->GetVictim());
 }
 
 void PetAI::_stopAttack()
