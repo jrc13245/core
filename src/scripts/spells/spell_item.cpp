@@ -526,6 +526,25 @@ SpellScript* GetScript_DiggingClaw(SpellEntry const*)
     return new DiggingClawScript();
 }
 
+// 11759 - Basilisk Sample (Untested Basilisk Sample)
+// 11760 - Hyena Sample (Untested Hyena Sample)
+// 11761 - Scorpid Sample (Untested Scorpid Sample)
+struct TanarisFieldSamplingScript : public SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0)
+            return roll_chance_i(50);
+
+        return true;
+    }
+};
+
+SpellScript* GetScript_TanarisFieldSampling(SpellEntry const*)
+{
+    return new TanarisFieldSamplingScript();
+}
+
 void AddSC_item_spell_scripts()
 {
     Script* newscript;
@@ -633,5 +652,10 @@ void AddSC_item_spell_scripts()
     newscript = new Script;
     newscript->Name = "spell_digging_claw";
     newscript->GetSpellScript = &GetScript_DiggingClaw;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_tanaris_field_sampling";
+    newscript->GetSpellScript = &GetScript_TanarisFieldSampling;
     newscript->RegisterSelf();
 }
