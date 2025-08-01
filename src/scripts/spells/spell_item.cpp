@@ -502,6 +502,30 @@ SpellScript* GetScript_InstantCast(SpellEntry const*)
     return new InstantCastScript();
 }
 
+// 5166 - Harvest Silithid Egg (Digging Claw), Quest 868 Egg Hunt
+struct DiggingClawScript : public SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_1 || effIdx == EFFECT_INDEX_2)
+        {
+            if (uint32 creatureId = spell->m_spellInfo->EffectMiscValue[effIdx])
+            {
+                if (spell->m_caster->FindNearestCreature(creatureId, 10.0f))
+                    return false;
+
+                return roll_chance_i(20);
+            }
+        }
+        return true;
+    }
+};
+
+SpellScript* GetScript_DiggingClaw(SpellEntry const*)
+{
+    return new DiggingClawScript();
+}
+
 void AddSC_item_spell_scripts()
 {
     Script* newscript;
@@ -604,5 +628,10 @@ void AddSC_item_spell_scripts()
     newscript = new Script;
     newscript->Name = "spell_instant_cast";
     newscript->GetSpellScript = &GetScript_InstantCast;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_digging_claw";
+    newscript->GetSpellScript = &GetScript_DiggingClaw;
     newscript->RegisterSelf();
 }
