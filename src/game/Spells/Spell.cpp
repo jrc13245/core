@@ -3602,7 +3602,8 @@ SpellCastResult Spell::prepare(Aura* triggeredByAura, uint32 chance)
         // set timer base at cast time
         ReSetTimer();
 
-        if (!m_IsTriggeredSpell && m_casterUnit)
+        // rogue's sap will be handled in spell script 'OnSuccessfulFinish'
+        if (!m_IsTriggeredSpell && m_casterUnit && m_spellInfo->SpellIconID != 249)
         {
             uint32 interruptFlags = AURA_INTERRUPT_ACTION_CANCELS;
 
@@ -3936,7 +3937,8 @@ void Spell::cast(bool skipCheck)
     SendSpellCooldown();
 
     // Remove any remaining invis auras on cast completion, should only be gnomish cloaking device
-    if (!m_IsTriggeredSpell && m_casterUnit)
+    // excepting rogue's sap which will be handled in 'OnSuccessfulFinish' spell script
+    if (!m_IsTriggeredSpell && m_casterUnit && m_spellInfo->SpellIconID != 249)
     {
         uint32 interruptFlags = AURA_INTERRUPT_ACTION_CANCELS_LATE;
 
