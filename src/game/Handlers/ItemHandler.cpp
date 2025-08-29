@@ -416,7 +416,9 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recv_data)
         data << pProto->Block;
         data << pProto->ItemSet;
         data << pProto->MaxDurability;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
         data << pProto->Area;
+#endif
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
         data << pProto->Map;
 #endif
