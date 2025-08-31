@@ -238,7 +238,7 @@ int main(int argc, char** argv)
     bool silent = false;
     bool buildOnlyGameobjectModels = false;
     bool quick = false;
-    int threads = 0;
+    int threads = 16;
 
     char const* offMeshInputPath = "offmesh.txt";
     char const* configInputPath = "config.json";
