@@ -54,6 +54,14 @@ enum ClassFlag
     CF_MAGE_UNK29                           = 29,   // CM0 20000000
     CF_MAGE_CONJURE                         = 30,   // CM0 40000000
     CF_MAGE_PORTALS                         = 31,   // CM0 80000000
+    CF_MAGE_SURGE                           = 32,   // CM0 80000000
+    CF_MAGE_UNK33                           = 33,   // CM0 80000000
+    CF_MAGE_POM                             = 34,   // CM0 80000000
+    CF_MAGE_UNK35                           = 35,   // CM0 80000000
+    CF_MAGE_ICICLE                          = 36,   // CM0 80000000
+    CF_MAGE_ARCANE_POW                      = 37,   // CM0 80000000
+    CF_MAGE_RESONANCE                       = 38,   // CM0 80000000
+
 
     // -- Warrior (4)
     CF_WARRIOR_CHARGE                       = 0,    // CM0 00000001
@@ -88,8 +96,12 @@ enum ClassFlag
     CF_WARRIOR_EXECUTE                      = 29,   // CM0 20000000
     CF_WARRIOR_INTERCEPT                    = 30,   // CM0 40000000
     CF_WARRIOR_RETALIATION                  = 31,   // CM0 80000000
-
     CF_WARRIOR_SHIELD_SLAM                  = 32,   // CM1 00000001
+    CF_WARRIOR_INTERVENE                    = 33,
+    CF_WARRIOR_PIERCING_HOWL                = 34,
+    CF_WARRIOR_WHIRLWIND                    = 35,
+    CF_WARRIOR_SWEEPING_STRIKES             = 36,
+    CF_WARRIOR_DEATH_WISH                   = 37,
 
     // -- Warlock (5)
     CF_WARLOCK_SHADOW_BOLT                  = 0,    // CM0 00000001
@@ -127,6 +139,12 @@ enum ClassFlag
 
     CF_WARLOCK_SIPHON_LIFE                  = 32,   // CM1 00000001
     CF_WARLOCK_CURSE_OF_DOOM                = 33,   // CM1 00000002
+    CF_WARLOCK_UNK34                        = 34,
+    CF_WARLOCK_UNK35                        = 35,
+    CF_WARLOCK_UNK36                        = 36,
+    CF_WARLOCK_UNK37                        = 37,
+    CF_WARLOCK_UNK38                        = 38,
+    CF_WARLOCK_UNK39                        = 39,
 
     // -- Priest (6)
     CF_PRIEST_POWER_WORD_SHIELD             = 0,    // CM0 00000001
@@ -162,7 +180,11 @@ enum ClassFlag
     CF_PRIEST_MISC1                         = 30,   // CM0 40000000 Ressurection, Shackle Undead, Lightwell
     CF_PRIEST_MISC2                         = 31,   // CM0 80000000
 
-    CF_PRIEST_DISPELLS                       = 32,   // CM1 00000001
+    CF_PRIEST_DISPELLS                      = 32,   // CM1 00000001
+    CF_PRIEST_UNK33                         = 33,
+    CF_PRIEST_UNK34                         = 34,
+    CF_PRIEST_UNK35                         = 35,
+
 
     // -- Druid (7)
     CF_DRUID_WRATH                          = 0,    // CM0 00000001
@@ -202,6 +224,15 @@ enum ClassFlag
     CF_DRUID_SWIFTMEND                      = 33,   // CM1 00000002
     CF_DRUID_DISPELLS                       = 34,   // CM1 00000004
     CF_DRUID_GROWL                          = 35,   // CM1 00000008
+    CF_DRUID_UNK36                          = 36,
+    CF_DRUID_UNK37                          = 37,
+    CF_DRUID_UNK38                          = 38,
+    CF_DRUID_UNK39                          = 39,
+    CF_DRUID_UNK40                          = 40,
+    CF_DRUID_UNK41                          = 41,
+    CF_DRUID_UNK42                          = 42,
+    CF_DRUID_UNK43                          = 43,
+    CF_DRUID_UNK44                          = 44,
 
     // -- Rogue (8)
     CF_ROGUE_THROW                          = 0,    // CM0 00000001
@@ -236,6 +267,14 @@ enum ClassFlag
     CF_ROGUE_UNK29                          = 29,   // CM0 20000000
     CF_ROGUE_MISC1                          = 30,   // CM0 40000000 Blade Furry, Cold Blood, Ghostly Strike, Premeditation, Revealed Flaw
     CF_ROGUE_MISC2                          = 31,   // CM0 80000000 Riposte, Pick Pocket, Disarm Trap, Blind
+    CF_ROGUE_UNK32                          = 32,
+    CF_ROGUE_UNK33                          = 33,
+    CF_ROGUE_UNK34                          = 34,
+    CF_ROGUE_UNK35                          = 35,
+    CF_ROGUE_UNK36                          = 36,
+    CF_ROGUE_UNK37                          = 37,
+    CF_ROGUE_UNK38                          = 38,
+    CF_ROGUE_UNK39                          = 39,
 
     // -- Hunter (9)
     CF_HUNTER_SHOOT                         = 0,    // CM0 00000001
@@ -270,6 +309,17 @@ enum ClassFlag
     CF_HUNTER_TAMED_PET_PASSIVE_FOCUS       = 29,   // CM0 20000000
     CF_HUNTER_TAMED_PET_PASSIVE_CRIT        = 30,   // CM0 40000000
     CF_HUNTER_TAMED_PET_PASSIVE_FRENZY      = 31,   // CM0 80000000
+    CF_HUNTER_UNK32                         = 32,
+    CF_HUNTER_UNK33                         = 33,
+    CF_HUNTER_UNK34                         = 34,
+    CF_HUNTER_UNK35                         = 35,
+    CF_HUNTER_UNK36                         = 36,
+    CF_HUNTER_UNK37                         = 37,
+    CF_HUNTER_UNK38                         = 38,
+    CF_HUNTER_UNK39                         = 39,
+    CF_HUNTER_UNK40                         = 40,
+    CF_HUNTER_UNK41                         = 41,
+    CF_HUNTER_UNK42                         = 42,
 
     // -- Paladin (10)
     CF_PALADIN_RIGHTEOUS_FURY               = 0,    // CM0 00000001
@@ -308,6 +358,14 @@ enum ClassFlag
     CF_PALADIN_UNK32                        = 32,   // CM1 00000001
     CF_PALADIN_PURIFY_CLEANSE               = 33,   // CM1 00000002 Purify & Cleanse
     CF_PALADIN_JUDGEMENT_OF_COMMAND         = 34,   // CM1 00000004
+    CF_PALADIN_UNK35                        = 35,
+    CF_PALADIN_UNK36                        = 36,
+    CF_PALADIN_UNK37                        = 37,
+    CF_PALADIN_UNK38                        = 38,
+    CF_PALADIN_UNK39                        = 39,
+    CF_PALADIN_UNK40                        = 40,
+    CF_PALADIN_UNK41                        = 41,
+    CF_PALADIN_UNK42                        = 42,
 
     // -- Shaman (11)
     CF_SHAMAN_LIGHTNING_BOLT                = 0,    // CM0 00000001
@@ -347,6 +405,23 @@ enum ClassFlag
     CF_SHAMAN_WINDFURY_TOTEM                = 33,   // CM1 00000002
     CF_SHAMAN_FLAMETONGUE_TOTEM             = 34,   // CM1 00000004
     CF_SHAMAN_CURES                         = 35,   // CM1 00000008 Cure Poison & Cure Disease
+    CF_SHAMAN_UNK36                         = 36,
+    CF_SHAMAN_UNK37                         = 37,
+    CF_SHAMAN_UNK38                         = 38,
+    CF_SHAMAN_UNK39                         = 39,
+    CF_SHAMAN_UNK40                         = 40,
+    CF_SHAMAN_UNK41                         = 41,
+    CF_SHAMAN_UNK42                         = 42,
+    CF_SHAMAN_UNK43                         = 43,
+    CF_SHAMAN_UNK44                         = 44,
+    CF_SHAMAN_UNK45                         = 45,
+    CF_SHAMAN_UNK46                         = 46,
+    CF_SHAMAN_UNK47                         = 47,
+    CF_SHAMAN_UNK48                         = 48,
+    CF_SHAMAN_UNK49                         = 49,
+    CF_SHAMAN_UNK50                         = 50,
+    CF_SHAMAN_UNK51                         = 51,
+    CF_SHAMAN_UNK52                         = 52,
 };
 
 #endif // _SPELL_CLASS_MASK_H

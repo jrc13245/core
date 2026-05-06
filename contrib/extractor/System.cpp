@@ -103,6 +103,13 @@ const char* CONF_mpq_list[] =
     "terrain.MPQ",
     "patch.MPQ",
     "patch-2.MPQ",
+    "patch-3.MPQ"
+    "patch-4.MPQ"
+    "patch-5.MPQ"
+    "patch-6.MPQ"
+    "patch-7.MPQ"
+    "patch-8.MPQ"
+    "patch-9.MPQ"
 };
 
 void CreateDir(const std::string& Path)
