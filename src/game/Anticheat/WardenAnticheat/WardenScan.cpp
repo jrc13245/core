@@ -30,7 +30,6 @@
 #include "Crypto/Hash/SHA1.h"
 #include "World.h"
 #include "Errors.h"
-#include "Platform/CompilerDefs.h"
 
 #include <string>
 #include <algorithm>
@@ -123,11 +122,6 @@ Scan::CheckT StringHashScan::GetChecker()
     };
 }
 
-#if COMPILER == COMPILER_GNU
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuninitialized"
-#endif
-
 WindowsStringHashScan::WindowsStringHashScan()
     : StringHashScan(), WindowsScan(
     // builder
@@ -151,10 +145,6 @@ MacStringHashScan::MacStringHashScan(bool moduleLoaded)
 {
 
 }
-
-#if COMPILER == COMPILER_GNU
-#pragma GCC diagnostic pop
-#endif
 
 WindowsModuleScan::WindowsModuleScan(std::string const& module, bool wanted, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild)
     : m_module(module), m_wanted(wanted),

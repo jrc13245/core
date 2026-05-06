@@ -85,7 +85,6 @@ include_directories(
 add_library(framework STATIC
   ${framework_SRCS}
 )
-mangos_target_flags(framework)
 
 SET_TARGET_PROPERTIES (framework PROPERTIES FOLDER "Game Libs")
 

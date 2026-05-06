@@ -24,6 +24,7 @@
 
 #include <deque>
 #include <mutex>
+#include <cassert>
 
 template <class T, class LockType, typename StorageType=std::deque<T> >
     class LockedQueue

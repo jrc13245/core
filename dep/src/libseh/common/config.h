@@ -100,12 +100,8 @@
 #endif
 
 #if !defined(LIBSEH_USE_COMPILER_SEH_IMPL)
-#ifndef GetExceptionCode
 #define GetExceptionCode()                       __libseh_get_exception_code()
-#endif
-#ifndef GetExceptionInformation
 #define GetExceptionInformation()                __libseh_get_exception_information()
-#endif
 #endif
 
 /* 

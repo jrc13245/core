@@ -456,10 +456,4 @@ inline float InterpolateValueAtIndex(float startIndex, float startValue, float e
 
 std::vector<std::string> SplitStringByDelimiter(std::string const& str, char delimiter);
 
-
-template<typename T>
-static void IgnoreResult(T const&)
-{
-}
-
 #endif

@@ -480,7 +480,7 @@ bool ConvertADT(char* filename, char* filename2, int cell_y, int cell_x)
     // Try store as packed in uint16 or uint8 values
     if (!(heightHeader.flags & MAP_HEIGHT_NO_HEIGHT))
     {
-        float step = 0.0f;
+        float step;
         // Try Store as uint values
         if (CONF_allow_float_to_int)
         {

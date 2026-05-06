@@ -29,9 +29,8 @@ if(WIN32)
 endif()
 
 add_executable(RealmMerge RealmMerge.cpp)
-mangos_target_flags(RealmMerge)
 SET_TARGET_PROPERTIES (RealmMerge PROPERTIES FOLDER Tools)
-target_link_libraries(RealmMerge
+target_link_libraries(RealmMerge 
                     shared
                     framework
 )

@@ -76,20 +76,12 @@ nonstd::expected<IO::Networking::SocketDescriptor, IO::NetworkError> IO::Network
     tv.tv_sec = (long)(timeoutMs.count() / 1000L);
     tv.tv_usec = (long)((timeoutMs.count() % 1000L) * 1000L);
 
-    ::fd_set readFds;
-    FD_ZERO(&readFds);
-    FD_SET(nativeSocket, &readFds);
-
-    ::fd_set writeFds;
-    FD_ZERO(&writeFds);
-    FD_SET(nativeSocket, &writeFds);
-
-    ::fd_set exceptFds;
-    FD_ZERO(&exceptFds);
-    FD_SET(nativeSocket, &exceptFds);
+    ::fd_set selectFileDescriptors;
+    FD_ZERO(&selectFileDescriptors);
+    FD_SET(nativeSocket, &selectFileDescriptors);
 
     // wait for some kind response
-    int selectStatus = ::select((int)(nativeSocket + 1), &readFds, &writeFds, &exceptFds, &tv);
+    int selectStatus = ::select((int)(nativeSocket + 1), &selectFileDescriptors, &selectFileDescriptors, &selectFileDescriptors, &tv);
     if (selectStatus == -1)
     { // ::select internal error
         int lastError = GetNetworkError();
