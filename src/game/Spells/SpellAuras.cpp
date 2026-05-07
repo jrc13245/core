@@ -8237,6 +8237,12 @@ bool _IsExclusiveSpellAura(SpellEntry const* spellproto, SpellEffectIndex eff, A
 
     switch (auraname)
     {
+        case SPELL_AURA_PERIODIC_DAMAGE:
+            // Force Periodic Damage to NEVER be exclusive if they have different family flags.
+            // This allows Rend and Deep Wounds to stack damage.
+            if (spellproto->SpellFamilyName != SPELLFAMILY_GENERIC)
+                return false;
+        break;
         //case SPELL_AURA_PERIODIC_DAMAGE:
         //case SPELL_AURA_DUMMY:
         //    return false;

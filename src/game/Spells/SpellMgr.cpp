@@ -877,6 +877,13 @@ bool SpellMgr::IsRankSpellDueToSpell(SpellEntry const* spellInfo_1, uint32 spell
     SpellEntry const* spellInfo_2 = sSpellMgr.GetSpellEntry(spellId_2);
     if (!spellInfo_1 || !spellInfo_2) return false;
     if (spellInfo_1->Id == spellId_2) return false;
+
+    if (spellInfo_1->SpellFamilyName != SPELLFAMILY_GENERIC &&
+        spellInfo_1->SpellFamilyName == spellInfo_2->SpellFamilyName &&
+        spellInfo_1->SpellFamilyFlags != spellInfo_2->SpellFamilyFlags)
+    {
+        return false;
+    }
     // Nostalrius : Check generique.
     if (spellInfo_1->SpellFamilyName == spellInfo_2->SpellFamilyName &&
         spellInfo_1->SpellFamilyFlags == spellInfo_2->SpellFamilyFlags &&
@@ -1097,9 +1104,9 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
             if (spellInfo_2->SpellFamilyName == SPELLFAMILY_WARRIOR)
             {
                 // Rend and Deep Wound
-                if (((spellInfo_1->SpellFamilyFlags & uint64(0x20)) && (spellInfo_2->SpellFamilyFlags & uint64(0x1000000000))) ||
-                        ((spellInfo_2->SpellFamilyFlags & uint64(0x20)) && (spellInfo_1->SpellFamilyFlags & uint64(0x1000000000))))
-                    return false;
+                //if (((spellInfo_1->SpellFamilyFlags & uint64(0x20)) && (spellInfo_2->SpellFamilyFlags & uint64(0x1000000000))) ||
+                //        ((spellInfo_2->SpellFamilyFlags & uint64(0x20)) && (spellInfo_1->SpellFamilyFlags & uint64(0x1000000000))))
+                //    return false;
 
                 // Battle Shout and Rampage
                 if ((spellInfo_1->SpellIconID == 456 && spellInfo_2->SpellIconID == 2006) ||
