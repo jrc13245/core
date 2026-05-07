@@ -102,6 +102,7 @@ enum ClassFlag
     CF_WARRIOR_WHIRLWIND                    = 35,
     CF_WARRIOR_SWEEPING_STRIKES             = 36,
     CF_WARRIOR_DEATH_WISH                   = 37,
+    CF_WARRIOR_DEEP_WOUND                   = 38,
 
     // -- Warlock (5)
     CF_WARLOCK_SHADOW_BOLT                  = 0,    // CM0 00000001
