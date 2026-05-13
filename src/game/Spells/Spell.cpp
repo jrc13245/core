@@ -3031,7 +3031,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                             {
                                 // clear cooldown at fail
                                 if (m_caster->IsPlayer())
-                                    m_caster->RemoveSpellCooldown(*m_spellInfo, true);
+                                    m_caster->RemoveSpellCooldown(m_spellInfo, true);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
                                 SendCastResult(SPELL_FAILED_NO_EDIBLE_CORPSES);
 #else
@@ -3467,7 +3467,7 @@ SpellCastResult Spell::prepare(Aura* triggeredByAura, uint32 chance)
             SendSpellStart();
             // add gcd server side (client side is handled by client itself)
             if (!m_caster->IsPlayer() || !static_cast<Player*>(m_caster)->HasCheatOption(PLAYER_CHEAT_NO_COOLDOWN))
-                m_caster->AddGCD(*m_spellInfo);
+                m_caster->AddGCD(m_spellInfo);
         }
         // execute triggered without cast time explicitly in call point
         else if ((m_timer == 0) &&
@@ -3971,7 +3971,7 @@ void Spell::SendSpellCooldown()
         if (pPlayer->HasCheatOption(PLAYER_CHEAT_NO_COOLDOWN))
             return;
 
-    m_caster->AddCooldown(*m_spellInfo, m_CastItem ? m_CastItem->GetProto() : nullptr, m_spellInfo->HasAttribute(SPELL_ATTR_COOLDOWN_ON_EVENT));
+    m_caster->AddCooldown(m_spellInfo, m_CastItem ? m_CastItem->GetProto() : nullptr, m_spellInfo->HasAttribute(SPELL_ATTR_COOLDOWN_ON_EVENT));
 }
 
 void Spell::update(uint32 difftime)
@@ -4318,7 +4318,7 @@ void Spell::finish(bool ok)
             // the spell during cast and then the spell stays disabled
             // Ignore the spell when it's triggered (ritual helper)
             if (m_spellInfo->Id == 18540 && !m_IsTriggeredSpell
-                && pPlayer->IsSpellReady(m_spellInfo->Id))
+                && pPlayer->IsSpellReady(m_spellInfo))
                 pPlayer->ToPlayer()->SendClearCooldown(18540, pPlayer);
         }
 
@@ -4423,26 +4423,27 @@ void Spell::SendCastResult(SpellCastResult result)
     SendCastResult((Player*)m_caster, m_originalSpellInfo ? m_originalSpellInfo : m_spellInfo, result);
 }
 
-void Spell::SendCastResult(Player* caster, SpellEntry const* spellInfo, SpellCastResult result)
+void Spell::SendCastResult(Player const* caster, SpellEntry const* spellInfo, SpellCastResult result)
 {
-    WorldPacket data(SMSG_CAST_RESULT, (4 + 1 + 1));
-    data << uint32(spellInfo->Id);
+    auto packet = std::make_unique<WorldPackets::Spell::CastResult>();
+    packet->spellEntry = spellInfo;
+    packet->failureReason = result;
 
     if (result != SPELL_CAST_OK && !spellInfo->HasAttribute(SPELL_ATTR_EX2_DO_NOT_REPORT_SPELL_FAILURE))
     {
-        data << static_cast<uint8>(SPELL_RESULT_STATUS_FAIL);
-        data << uint8(spellInfo->IsPassiveSpell() ? SPELL_FAILED_DONT_REPORT : result);                                  // problem
+        packet->result = static_cast<uint8>(SPELL_RESULT_STATUS_FAIL);
+        packet->failureReason = static_cast<uint8>(spellInfo->IsPassiveSpell() ? SPELL_FAILED_DONT_REPORT : result);
         switch (result)
         {
             case SPELL_FAILED_NOT_READY:
                 if (spellInfo->HasAttribute(SPELL_ATTR_COOLDOWN_ON_EVENT))
-                    data << uint32(caster->IsSpellOnPermanentCooldown(*spellInfo));
+                    packet->failureArg1 = caster->IsSpellOnPermanentCooldown(spellInfo);
                 break;
             case SPELL_FAILED_REQUIRES_SPELL_FOCUS:
-                data << uint32(spellInfo->RequiresSpellFocus);
+                packet->failureArg1 = spellInfo->RequiresSpellFocus;
                 break;
             case SPELL_FAILED_REQUIRES_AREA:
-                data << uint32(sSpellMgr.GetRequiredAreaForSpell(spellInfo->Id));
+                packet->failureArg1 = sSpellMgr.GetRequiredAreaForSpell(spellInfo->Id);
                 break;
             case SPELL_FAILED_EQUIPPED_ITEM_CLASS:
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
@@ -4451,9 +4452,8 @@ void Spell::SendCastResult(Player* caster, SpellEntry const* spellInfo, SpellCas
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
             case SPELL_FAILED_EQUIPPED_ITEM_CLASS_OFFHAND:
 #endif
-                data << uint32(spellInfo->EquippedItemClass);
-                data << uint32(spellInfo->EquippedItemSubClassMask);
-                data << uint32(spellInfo->EquippedItemInventoryTypeMask);
+                packet->failureArg1 = spellInfo->EquippedItemClass;
+                packet->failureArg2 = spellInfo->EquippedItemSubClassMask;
                 break;
             default:
                 break;
@@ -4461,10 +4461,10 @@ void Spell::SendCastResult(Player* caster, SpellEntry const* spellInfo, SpellCas
     }
     else
     {
-        data << static_cast<uint8>(SPELL_RESULT_STATUS_OKAY);
+        packet->result = static_cast<uint8>(SPELL_RESULT_STATUS_OKAY);
     }
 
-    caster->GetSession()->SendPacket(&data);
+    caster->GetSession()->SendPacket(std::move(packet));
 }
 
 static void WriteGuidHelper(WorldPacket& data, Object* pCaster)
@@ -5384,7 +5384,7 @@ SpellCastResult Spell::CheckCast(bool strict)
     // check cooldowns to prevent cheating (ignore passive spells, that client side visual only)
     if (!m_IsTriggeredSpell && m_caster->IsPlayer() && !m_spellInfo->HasAttribute(SPELL_ATTR_PASSIVE)
         && !m_spellInfo->IsAutoRepeatRangedSpell() // auto shot managed by attack timer
-        && !m_caster->IsSpellReady(*m_spellInfo, m_CastItem ? m_CastItem->GetProto() : nullptr))
+        && !m_caster->IsSpellReady(m_spellInfo, m_CastItem ? m_CastItem->GetProto() : nullptr))
     {
         return (m_triggeredByAuraSpell || m_spellInfo->Attributes & SPELL_ATTR_COOLDOWN_ON_EVENT) ? SPELL_FAILED_DONT_REPORT : SPELL_FAILED_NOT_READY;
     }
@@ -6577,7 +6577,7 @@ SpellCastResult Spell::CheckPetCast(Unit* target)
             }
         }
         // cooldown
-        if (!m_caster->IsSpellReady(*m_spellInfo))
+        if (!m_caster->IsSpellReady(m_spellInfo))
             return SPELL_FAILED_NOT_READY;
     }
 
