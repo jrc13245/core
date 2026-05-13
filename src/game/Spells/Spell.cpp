@@ -401,6 +401,22 @@ void Spell::FillTargetMap()
                 ++itr;
         }
 
+        if (m_spellInfo->Id == 1680 && m_casterUnit)
+        {
+            uint32 maxTargets = m_spellInfo->MaxAffectedTargets;
+
+            // Explicitly cast to SpellEffectIndex to fix the conversion error
+            if (Aura* extra = m_casterUnit->GetAura(53204, SpellEffectIndex(EFFECT_0)))
+            {
+                maxTargets += extra->GetModifier()->m_amount;
+            }
+
+            if (maxTargets > 0 && tmpUnitMap.size() > maxTargets)
+            {
+                tmpUnitMap.resize(maxTargets);
+            }
+        }
+
         for (const auto iunit : tmpUnitMap)
             AddUnitTarget(iunit, SpellEffectIndex(i));
     }
@@ -2263,10 +2279,20 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
         }
         case TARGET_ENUM_UNITS_ENEMY_AOE_AT_SRC_LOC:
         {
+            // 1. Check for Whirlwind and the specific Aura 53204
+            if (m_spellInfo->Id == 1680 && m_casterUnit)
+            {
+                if (Aura* extra = m_casterUnit->GetAura(53204, EFFECT_INDEX_0))
+                {
+                    // Increase the target cap by the aura's amount
+                    unMaxTargets += extra->GetModifier()->m_amount;
+                }
+            }
+
             FillAreaTargets(targetUnitMap, radius, PUSH_SRC_CENTER, SPELL_TARGETS_AOE_DAMAGE);
             float minDist = -1;
 
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+            #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
             switch (m_spellInfo->Id)
             {
                 // Shadow Storm
@@ -2276,7 +2302,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     minDist = 25.0f;
                     break;
             }
-#endif
+            #endif
 
             if (minDist > 0)
             {
@@ -2290,11 +2316,14 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                         targetUnitMap.erase(itr);
                 }
             }
-            if (selectClosestTargets && unMaxTargets && targetUnitMap.size() > unMaxTargets)
+
+            // 2. The core now uses the updated unMaxTargets to trim the list
+            if (unMaxTargets && targetUnitMap.size() > unMaxTargets)
             {
+                // For Whirlwind, we usually want closest targets if we are over the cap
                 targetUnitMap.sort(TargetDistanceOrderNear(m_caster));
                 UnitList::iterator itr = targetUnitMap.begin();
-                advance(itr, unMaxTargets);
+                std::advance(itr, unMaxTargets);
                 targetUnitMap.erase(itr, targetUnitMap.end());
             }
             break;

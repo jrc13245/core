@@ -1728,6 +1728,71 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         target->HandleEmoteCommand(EMOTE_STATE_DANCE);
                         break;
                     }
+                    case 52322: // All Weapons Master
+                    {
+                        if (GetEffIndex() != EFFECT_INDEX_0 || !target || target->GetTypeId() != TYPEID_PLAYER)
+                            return;
+
+                        Player* pPlayer = (Player*)target;
+                        uint32 weaponSpells[] = { 61003, 61004, 61005, 61006, 61007, 61008, 61009 };
+
+                        if (apply)
+                        {
+                            // First, purge any existing ones to prevent double-stacking if the set bonus toggles
+                            for (uint32 subSpellId : weaponSpells)
+                            {
+                                pPlayer->RemoveAurasDueToSpell(subSpellId);
+                            }
+
+                            for (uint32 subSpellId : weaponSpells)
+                            {
+                                pPlayer->CastSpell(pPlayer, subSpellId, true);
+                            }
+                        }
+                        else
+                        {
+                            // This block is likely being skipped by the Set Bonus system.
+                            for (uint32 subSpellId : weaponSpells)
+                            {
+                                pPlayer->RemoveAurasDueToSpell(subSpellId);
+                            }
+                        }
+                        break;
+                    }
+                    case 61002:
+                    {
+                        if (GetEffIndex() != EFFECT_INDEX_0 || !target || target->GetTypeId() != TYPEID_PLAYER)
+                            return; // It is okay to return here as it's a guard clause
+
+                            Player* pPlayer = (Player*)target;
+                        uint32 targetSpellId = 0;
+
+                        switch (pPlayer->GetClass())
+                        {
+                            case CLASS_DRUID:   targetSpellId = 51013; break;
+                            case CLASS_ROGUE:   targetSpellId = 51014; break;
+                            case CLASS_WARRIOR: targetSpellId = 51015; break;
+                            case CLASS_HUNTER:  targetSpellId = 52402; break;
+                            default: break;
+                        }
+
+                        if (targetSpellId)
+                        {
+                            if (apply)
+                            {
+                                // Adding a 'Triggered' flag explicitly to bypass requirements
+                                if (!pPlayer->HasAura(targetSpellId))
+                                    pPlayer->CastSpell(pPlayer, targetSpellId, true, NULL, NULL, pPlayer->GetGUID());
+                            }
+                            else
+                            {
+                                // Only remove if the player actually has it
+                                if (pPlayer->HasAura(targetSpellId))
+                                    pPlayer->RemoveAurasDueToSpell(targetSpellId);
+                            }
+                        }
+                        break; // ALWAYS use break instead of return inside a switch case
+                    }
                 }
                 break;
             }
@@ -8189,6 +8254,21 @@ bool _IsExclusiveSpellAura(SpellEntry const* spellproto, SpellEffectIndex eff, A
         case 27669: // Orgrimmar Gift of Friendship
         case 27670: // Thunder Bluff Gift of Friendship
         case 27671: // Undercity Gift of Friendship
+        case 52322: // All Weapons Master
+        case 57689: // Daggers
+        case 57681: // Staves
+        case 57679: // Polearms
+        case 57677: // Fists
+        case 57675: // Swords
+        case 57673: // Axes
+        case 57671: // Maces
+        case 61003:
+        case 61004:
+        case 61005:
+        case 61006:
+        case 61007:
+        case 61008:
+        case 61009:
             return false;
 
         case 17538: // Elixir of the Mongoose, should stack with EVERYTHING

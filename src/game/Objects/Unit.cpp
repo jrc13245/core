@@ -4099,6 +4099,26 @@ void Unit::RemoveSpellAuraHolder(SpellAuraHolder* holder, AuraRemoveMode mode)
 
     uint32 auraSpellId = holder->GetId();
 
+    if (auraSpellId == 52322)
+    {
+        uint32 weaponSpells[] = { 61003, 61004, 61005, 61006, 61007, 61008, 61009 };
+        for (uint32 subId : weaponSpells)
+        {
+            RemoveAurasDueToSpell(subId);
+        }
+
+        if (GetTypeId() == TYPEID_PLAYER)
+        {
+            Player* pPlayer = (Player*)this;
+            pPlayer->UpdateAttackPowerAndDamage();
+            pPlayer->UpdateDamagePhysical(BASE_ATTACK);
+
+            // If all else fails, this tells the client the "Aura" was officially removed
+            // which usually forces the character sheet to update.
+            pPlayer->UpdateAuraForGroup(auraSpellId);
+        }
+    }
+
     // If holder in use (removed from code that plan access to it data after return)
     // store it in holder list with delayed deletion
     DeleteAuraHolder(holder);
