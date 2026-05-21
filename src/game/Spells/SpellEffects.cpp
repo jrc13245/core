@@ -994,9 +994,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "AddObject at SpellEfects.cpp EffectDummy");
                     map->Add(pGameObj);
 
-                    WorldPacket data(SMSG_GAMEOBJECT_SPAWN_ANIM, 8);
-                    data << ObjectGuid(pGameObj->GetObjectGuid());
-                    m_caster->SendMessageToSet(&data, true);
+                    pGameObj->SendObjectSpawnAnim();
 
                     return;
                 }
@@ -1891,7 +1889,7 @@ void Spell::DoCreateItem(SpellEffectIndex effIdx, uint32 itemtype)
         else
         {
             // if not created by another reason from full inventory or unique items amount limitation
-            player->SendEquipError(msg, nullptr, nullptr, newItemId);
+            player->SendEquipError(msg, nullptr, nullptr, 0, newItemId);
             return;
         }
     }
@@ -2204,7 +2202,8 @@ void Spell::EffectSummonChangeItem(SpellEffectIndex effIdx)
     if (player->IsInventoryPos(pos))
     {
         ItemPosCountVec dest;
-        uint8 msg = player->CanStoreItem(m_CastItem->GetBagSlot(), m_CastItem->GetSlot(), dest, pNewItem, true);
+        uint8 bagSlot = 0;
+        uint8 msg = player->CanStoreItem(m_CastItem->GetBagSlot(), m_CastItem->GetSlot(), dest, pNewItem, bagSlot, true);
         if (msg == EQUIP_ERR_OK)
         {
             player->DestroyItem(m_CastItem->GetBagSlot(), m_CastItem->GetSlot(), true);
@@ -2219,7 +2218,8 @@ void Spell::EffectSummonChangeItem(SpellEffectIndex effIdx)
     else if (player->IsBankPos(pos))
     {
         ItemPosCountVec dest;
-        uint8 msg = player->CanBankItem(m_CastItem->GetBagSlot(), m_CastItem->GetSlot(), dest, pNewItem, true);
+        uint8 bagSlot = 0;
+        uint8 msg = player->CanBankItem(m_CastItem->GetBagSlot(), m_CastItem->GetSlot(), dest, pNewItem, true, bagSlot);
         if (msg == EQUIP_ERR_OK)
         {
             player->DestroyItem(m_CastItem->GetBagSlot(), m_CastItem->GetSlot(), true);
@@ -5140,9 +5140,7 @@ void Spell::EffectSummonObject(SpellEffectIndex effIdx)
     m_casterUnit->AddGameObject(pGameObj);
 
     map->Add(pGameObj);
-    WorldPacket data(SMSG_GAMEOBJECT_SPAWN_ANIM, 8);
-    data << ObjectGuid(pGameObj->GetObjectGuid());
-    m_casterUnit->SendMessageToSet(&data, true);
+    pGameObj->SendObjectSpawnAnim();
 
     m_casterUnit->m_ObjectSlotGuid[slot] = pGameObj->GetObjectGuid();
 
@@ -5815,13 +5813,10 @@ void Spell::EffectBind(SpellEffectIndex effIdx)
     player->SetHomebindToLocation(loc, areaId);
 
     // binding
-    WorldPacket data(SMSG_BINDPOINTUPDATE, (4 + 4 + 4 + 4 + 4));
-    data << float(loc.x);
-    data << float(loc.y);
-    data << float(loc.z);
-    data << uint32(loc.mapId);
-    data << uint32(areaId);
-    player->SendDirectMessage(&data);
+    auto packet = std::make_unique<WorldPackets::Misc::BindpointUpdate>();
+    packet->location = loc;
+    packet->areaId = areaId;
+    player->GetSession()->SendPacket(std::move(packet));
 
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "New Home Position X is %f", loc.x);
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "New Home Position Y is %f", loc.y);
@@ -5830,10 +5825,10 @@ void Spell::EffectBind(SpellEffectIndex effIdx)
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "New Home AreaId is %u", areaId);
 
     // zone update
-    data.Initialize(SMSG_PLAYERBOUND, 8 + 4);
-    data << m_caster->GetObjectGuid();
-    data << uint32(areaId);
-    player->SendDirectMessage(&data);
+    auto playerBoundPacket = std::make_unique<WorldPackets::Misc::PlayerBound>();
+    playerBoundPacket->binderGuid = m_caster->GetObjectGuid();
+    playerBoundPacket->areaId = areaId;
+    player->GetSession()->SendPacket(std::move(playerBoundPacket));
 }
 
 void Spell::EffectDespawnObject(SpellEffectIndex effIdx)

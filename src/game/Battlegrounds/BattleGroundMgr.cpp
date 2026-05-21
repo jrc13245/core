@@ -1140,10 +1140,9 @@ std::unique_ptr<ServerPacket> BattleGroundMgr::BuildGroupJoinedBattlegroundPacke
 
 std::unique_ptr<ServerPacket> BattleGroundMgr::BuildUpdateWorldStatePacket(uint32 field, uint32 value)
 {
-    auto packet = std::make_unique<WorldPackets::Battleground::UpdateWorldState>();
+    auto packet = std::make_unique<WorldPackets::Misc::UpdateWorldState>();
     packet->field = field;
     packet->value = value;
-
     return packet;
 }
 
@@ -1617,9 +1616,9 @@ void BattleGroundMgr::LoadBattleEventIndexes()
     events.event1 = BG_EVENT_NONE;
     events.event2 = BG_EVENT_NONE;
     m_gameObjectBattleEventIndexMap.clear();             // need for reload case
-    m_gameObjectBattleEventIndexMap[-1].push_back(events);
+    m_gameObjectBattleEventIndexMap.emplace(BG_UNREGISTERED_GUID, std::vector<BattleGroundEventIdx>{events});
     m_creatureBattleEventIndexMap.clear();               // need for reload case
-    m_creatureBattleEventIndexMap[-1].push_back(events);
+    m_creatureBattleEventIndexMap.emplace(BG_UNREGISTERED_GUID, std::vector<BattleGroundEventIdx>{events});
 
     uint32 count = 0;
 
