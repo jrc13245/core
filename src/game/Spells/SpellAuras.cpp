@@ -1763,9 +1763,11 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     case 61002:
                     {
                         if (GetEffIndex() != EFFECT_INDEX_0 || !target || target->GetTypeId() != TYPEID_PLAYER)
-                            return; // It is okay to return here as it's a guard clause
+                        {
+                            return; // Guard clause correctly returns from the wrapping function
+                        }
 
-                            Player* pPlayer = (Player*)target;
+                        Player* pPlayer = (Player*)target;
                         uint32 targetSpellId = 0;
 
                         switch (pPlayer->GetClass())
@@ -1792,7 +1794,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                                     pPlayer->RemoveAurasDueToSpell(targetSpellId);
                             }
                         }
-                        break; // ALWAYS use break instead of return inside a switch case
+                        break; // Correctly breaks out of the outer switch case
                     }
                 }
                 break;
@@ -8366,6 +8368,7 @@ bool _IsExclusiveSpellAura(SpellEntry const* spellproto, SpellEffectIndex eff, A
         default:
             return false;
     }
+    return false;
 }
 
 void Aura::ComputeExclusive()

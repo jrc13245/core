@@ -135,30 +135,39 @@ char pkware_copyright[] = "PKWARE Data Compression Library for Win32\r\n"
 /* skips given number of bits. */
 static int32_t skip_bit(pkzip_cmp_s *mpq_pkzip, uint32_t bits) {
 
-	/* check if number of bits required is less than number of bits in the buffer. */
-	if (bits <= mpq_pkzip->extra_bits) {
-		mpq_pkzip->extra_bits  -= bits;
-		mpq_pkzip->bit_buf    >>= bits;
-		return 0;
-	}
+    /* check if number of bits required is less than number of bits in the buffer. */
+    if (bits <= mpq_pkzip->extra_bits) {
+        mpq_pkzip->extra_bits  -= bits;
+        mpq_pkzip->bit_buf     >>= bits;
+        return 0;
+    }
 
-	/* load input buffer if necessary. */
-	mpq_pkzip->bit_buf >>= mpq_pkzip->extra_bits;
-	if (mpq_pkzip->in_pos == mpq_pkzip->in_bytes) {
-		mpq_pkzip->in_pos = sizeof(mpq_pkzip->in_buf);
-		if ((mpq_pkzip->in_bytes = mpq_pkzip->read_buf((char *)mpq_pkzip->in_buf, &mpq_pkzip->in_pos, mpq_pkzip->param)) == 0) {
-			return 1;
-		}
-		mpq_pkzip->in_pos = 0;
-	}
+    /* load input buffer if necessary. */
+    mpq_pkzip->bit_buf >>= mpq_pkzip->extra_bits;
+    if (mpq_pkzip->in_pos == mpq_pkzip->in_bytes) {
+        mpq_pkzip->in_pos = sizeof(mpq_pkzip->in_buf);
 
-	/* update bit buffer. */
-	mpq_pkzip->bit_buf     |= (mpq_pkzip->in_buf[mpq_pkzip->in_pos++] << 8);
-	mpq_pkzip->bit_buf    >>= (bits - mpq_pkzip->extra_bits);
-	mpq_pkzip->extra_bits   = (mpq_pkzip->extra_bits - bits) + 8;
+        /* FIX: Copy packed member to a local, aligned variable to avoid unaligned pointer warning */
+        uint32_t local_in_pos = mpq_pkzip->in_pos;
+        uint32_t read_bytes = mpq_pkzip->read_buf((char *)mpq_pkzip->in_buf, &local_in_pos, mpq_pkzip->param);
 
-	/* if no error was found, return zero. */
-	return 0;
+        /* Write the modified value back to the packed struct */
+        mpq_pkzip->in_pos = local_in_pos;
+        mpq_pkzip->in_bytes = read_bytes;
+
+        if (read_bytes == 0) {
+            return 1;
+        }
+        mpq_pkzip->in_pos = 0;
+    }
+
+    /* update bit buffer. */
+    mpq_pkzip->bit_buf     |= (mpq_pkzip->in_buf[mpq_pkzip->in_pos++] << 8);
+    mpq_pkzip->bit_buf    >>= (bits - mpq_pkzip->extra_bits);
+    mpq_pkzip->extra_bits   = (mpq_pkzip->extra_bits - bits) + 8;
+
+    /* if no error was found, return zero. */
+    return 0;
 }
 
 /* this function generate the decode tables used for decryption. */
@@ -528,75 +537,82 @@ static uint32_t expand(pkzip_cmp_s *mpq_pkzip) {
 /* this function explode the data stream. */
 uint32_t libmpq__do_decompress_pkzip(uint8_t *work_buf, void *param) {
 
-	/* some common variables. */
-	pkzip_cmp_s *mpq_pkzip = (pkzip_cmp_s *)work_buf;
+    /* some common variables. */
+    pkzip_cmp_s *mpq_pkzip = (pkzip_cmp_s *)work_buf;
 
-	/* set the whole work buffer to zeros. */
-	memset(mpq_pkzip, 0, sizeof(pkzip_cmp_s));
+    /* set the whole work buffer to zeros. */
+    memset(mpq_pkzip, 0, sizeof(pkzip_cmp_s));
 
-	/* initialize work struct and load compressed data. */
-	mpq_pkzip->read_buf   = data_read_input;
-	mpq_pkzip->write_buf  = data_write_output;
-	mpq_pkzip->param      = param;
-	mpq_pkzip->in_pos     = sizeof(mpq_pkzip->in_buf);
-	mpq_pkzip->in_bytes   = mpq_pkzip->read_buf((char *)mpq_pkzip->in_buf, &mpq_pkzip->in_pos, mpq_pkzip->param);
+    /* initialize work struct and load compressed data. */
+    mpq_pkzip->read_buf   = data_read_input;
+    mpq_pkzip->write_buf  = data_write_output;
+    mpq_pkzip->param      = param;
+    mpq_pkzip->in_pos     = sizeof(mpq_pkzip->in_buf);
 
-	/* check if we have pkzip data. */
-	if (mpq_pkzip->in_bytes <= 4) {
-		return LIBMPQ_PKZIP_CMP_BAD_DATA;
-	}
+    /* FIX: Use a local, aligned variable instead of the packed struct member's address */
+    uint32_t local_in_pos = mpq_pkzip->in_pos;
+    uint32_t read_bytes   = mpq_pkzip->read_buf((char *)mpq_pkzip->in_buf, &local_in_pos, mpq_pkzip->param);
 
-	/* get the compression type. */
-	mpq_pkzip->cmp_type   = mpq_pkzip->in_buf[0];
+    /* Write back the updated stack values to the packed struct */
+    mpq_pkzip->in_pos     = local_in_pos;
+    mpq_pkzip->in_bytes   = read_bytes;
 
-	/* get the dictionary size. */
-	mpq_pkzip->dsize_bits = mpq_pkzip->in_buf[1];
+    /* check if we have pkzip data. */
+    if (mpq_pkzip->in_bytes <= 4) {
+        return LIBMPQ_PKZIP_CMP_BAD_DATA;
+    }
 
-	/* initialize 16-bit bit buffer. */
-	mpq_pkzip->bit_buf    = mpq_pkzip->in_buf[2];
+    /* get the compression type. */
+    mpq_pkzip->cmp_type   = mpq_pkzip->in_buf[0];
 
-	/* extra (over 8) bits. */
-	mpq_pkzip->extra_bits = 0;
+    /* get the dictionary size. */
+    mpq_pkzip->dsize_bits = mpq_pkzip->in_buf[1];
 
-	/* position in input buffer. */
-	mpq_pkzip->in_pos     = 3;
+    /* initialize 16-bit bit buffer. */
+    mpq_pkzip->bit_buf    = mpq_pkzip->in_buf[2];
 
-	/* check if valid dictionary size. */
-	if (4 > mpq_pkzip->dsize_bits || mpq_pkzip->dsize_bits > 6) {
-		return LIBMPQ_PKZIP_CMP_INV_DICTSIZE;
-	}
+    /* extra (over 8) bits. */
+    mpq_pkzip->extra_bits = 0;
 
-	/* shifted by 'sar' instruction. */
-	mpq_pkzip->dsize_mask = 0xFFFF >> (0x10 - mpq_pkzip->dsize_bits);
+    /* position in input buffer. */
+    mpq_pkzip->in_pos     = 3;
 
-	/* check if we are using binary compression. */
-	if (mpq_pkzip->cmp_type != LIBMPQ_PKZIP_CMP_BINARY) {
+    /* check if valid dictionary size. */
+    if (4 > mpq_pkzip->dsize_bits || mpq_pkzip->dsize_bits > 6) {
+        return LIBMPQ_PKZIP_CMP_INV_DICTSIZE;
+    }
 
-		/* check if we are using ascii compression. */
-		if (mpq_pkzip->cmp_type != LIBMPQ_PKZIP_CMP_ASCII) {
-			return LIBMPQ_PKZIP_CMP_INV_MODE;
-		}
+    /* shifted by 'sar' instruction. */
+    mpq_pkzip->dsize_mask = 0xFFFF >> (0x10 - mpq_pkzip->dsize_bits);
 
-		/* create ascii buffer. */
-		memcpy(mpq_pkzip->bits_asc, pkzip_bits_asc, sizeof(mpq_pkzip->bits_asc));
-		generate_tables_ascii(mpq_pkzip);
-	}
+    /* check if we are using binary compression. */
+    if (mpq_pkzip->cmp_type != LIBMPQ_PKZIP_CMP_BINARY) {
 
-	/* create the tables for decode. */
-	memcpy(mpq_pkzip->slen_bits, pkzip_slen_bits, sizeof(mpq_pkzip->slen_bits));
-	generate_tables_decode(0x10, mpq_pkzip->slen_bits, pkzip_len_code, mpq_pkzip->pos2);
+        /* check if we are using ascii compression. */
+        if (mpq_pkzip->cmp_type != LIBMPQ_PKZIP_CMP_ASCII) {
+            return LIBMPQ_PKZIP_CMP_INV_MODE;
+        }
 
-	/* create the tables for decode. */
-	memcpy(mpq_pkzip->clen_bits, pkzip_clen_bits, sizeof(mpq_pkzip->clen_bits));
-	memcpy(mpq_pkzip->len_base, pkzip_len_base, sizeof(mpq_pkzip->len_base));
-	memcpy(mpq_pkzip->dist_bits, pkzip_dist_bits, sizeof(mpq_pkzip->dist_bits));
-	generate_tables_decode(0x40, mpq_pkzip->dist_bits, pkzip_dist_code, mpq_pkzip->pos1);
+        /* create ascii buffer. */
+        memcpy(mpq_pkzip->bits_asc, pkzip_bits_asc, sizeof(mpq_pkzip->bits_asc));
+        generate_tables_ascii(mpq_pkzip);
+    }
 
-	/* check if data extraction works. */
-	if (expand(mpq_pkzip) != 0x306) {
-		return LIBMPQ_PKZIP_CMP_NO_ERROR;
-	}
+    /* create the tables for decode. */
+    memcpy(mpq_pkzip->slen_bits, pkzip_slen_bits, sizeof(mpq_pkzip->slen_bits));
+    generate_tables_decode(0x10, mpq_pkzip->slen_bits, pkzip_len_code, mpq_pkzip->pos2);
 
-	/* something failed, so return error. */
-	return LIBMPQ_PKZIP_CMP_ABORT;
+    /* create the tables for decode. */
+    memcpy(mpq_pkzip->clen_bits, pkzip_clen_bits, sizeof(mpq_pkzip->clen_bits));
+    memcpy(mpq_pkzip->len_base, pkzip_len_base, sizeof(mpq_pkzip->len_base));
+    memcpy(mpq_pkzip->dist_bits, pkzip_dist_bits, sizeof(mpq_pkzip->dist_bits));
+    generate_tables_decode(0x40, mpq_pkzip->dist_bits, pkzip_dist_code, mpq_pkzip->pos1);
+
+    /* check if data extraction works. */
+    if (expand(mpq_pkzip) != 0x306) {
+        return LIBMPQ_PKZIP_CMP_NO_ERROR;
+    }
+
+    /* something failed, so return error. */
+    return LIBMPQ_PKZIP_CMP_ABORT;
 }

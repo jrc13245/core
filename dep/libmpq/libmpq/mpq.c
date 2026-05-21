@@ -608,153 +608,158 @@ int32_t libmpq__file_read(mpq_archive_s *mpq_archive, uint32_t file_number, uint
 /* this function open a file in the given archive and caches the block offset information. */
 int32_t libmpq__block_open_offset(mpq_archive_s *mpq_archive, uint32_t file_number) {
 
-	/* some common variables. */
-	uint32_t i;
-	uint32_t packed_size;
-	int32_t result = 0;
+    /* some common variables. */
+    uint32_t i;
+    uint32_t packed_size;
+    int32_t result = 0;
 
-	/* check if given file number is not out of range. */
-	CHECK_FILE_NUM(file_number, mpq_archive)
+    /* check if given file number is not out of range. */
+    CHECK_FILE_NUM(file_number, mpq_archive)
 
-	if (mpq_archive->mpq_file[file_number]) {
+    if (mpq_archive->mpq_file[file_number]) {
 
-		/* file already opened, so increment counter */
-		mpq_archive->mpq_file[file_number]->open_count++;
-		return LIBMPQ_SUCCESS;
-	}
+        /* file already opened, so increment counter */
+        mpq_archive->mpq_file[file_number]->open_count++;
+        return LIBMPQ_SUCCESS;
+    }
 
-	/* check if file is not stored in a single sector. */
-	if ((mpq_archive->mpq_block[mpq_archive->mpq_map[file_number].block_table_indices].flags & LIBMPQ_FLAG_SINGLE) == 0) {
+    /* check if file is not stored in a single sector. */
+    if ((mpq_archive->mpq_block[mpq_archive->mpq_map[file_number].block_table_indices].flags & LIBMPQ_FLAG_SINGLE) == 0) {
 
-		/* get packed size based on block size and block count. */
-		packed_size = sizeof(uint32_t) * (((mpq_archive->mpq_block[mpq_archive->mpq_map[file_number].block_table_indices].unpacked_size + mpq_archive->block_size - 1) / mpq_archive->block_size) + 1);
-	} else {
+        /* get packed size based on block size and block count. */
+        packed_size = sizeof(uint32_t) * (((mpq_archive->mpq_block[mpq_archive->mpq_map[file_number].block_table_indices].unpacked_size + mpq_archive->block_size - 1) / mpq_archive->block_size) + 1);
+    } else {
 
-		/* file is stored in single sector and we need only two entries for the packed block offset table. */
-		packed_size = sizeof(uint32_t) * 2;
-	}
+        /* file is stored in single sector and we need only two entries for the packed block offset table. */
+        packed_size = sizeof(uint32_t) * 2;
+    }
 
-	/* check if data has one extra entry. */
-	if ((mpq_archive->mpq_block[mpq_archive->mpq_map[file_number].block_table_indices].flags & LIBMPQ_FLAG_CRC) != 0) {
+    /* check if data has one extra entry. */
+    if ((mpq_archive->mpq_block[mpq_archive->mpq_map[file_number].block_table_indices].flags & LIBMPQ_FLAG_CRC) != 0) {
 
-		/* add one uint32_t. */
-		packed_size += sizeof(uint32_t);
-	}
+        /* add one uint32_t. */
+        packed_size += sizeof(uint32_t);
+    }
 
-	/* allocate memory for the file. */
-	if ((mpq_archive->mpq_file[file_number] = calloc(1, sizeof(mpq_file_s))) == NULL) {
+    /* allocate memory for the file. */
+    if ((mpq_archive->mpq_file[file_number] = calloc(1, sizeof(mpq_file_s))) == NULL) {
 
-		/* memory allocation problem. */
-		result = LIBMPQ_ERROR_MALLOC;
-		goto error;
-	}
+        /* memory allocation problem. */
+        result = LIBMPQ_ERROR_MALLOC;
+        goto error;
+    }
 
-	/* allocate memory for the packed block offset table. */
-	if ((mpq_archive->mpq_file[file_number]->packed_offset = calloc(1, packed_size)) == NULL) {
+    /* allocate memory for the packed block offset table. */
+    if ((mpq_archive->mpq_file[file_number]->packed_offset = calloc(1, packed_size)) == NULL) {
 
-		/* memory allocation problem. */
-		result = LIBMPQ_ERROR_MALLOC;
-		goto error;
-	}
+        /* memory allocation problem. */
+        result = LIBMPQ_ERROR_MALLOC;
+        goto error;
+    }
 
-	/* initialize counter to one opening */
-	mpq_archive->mpq_file[file_number]->open_count = 1;
+    /* initialize counter to one opening */
+    mpq_archive->mpq_file[file_number]->open_count = 1;
 
-	/* check if we need to load the packed block offset table, we will maintain this table for unpacked files too. */
-	if ((mpq_archive->mpq_block[mpq_archive->mpq_map[file_number].block_table_indices].flags & LIBMPQ_FLAG_COMPRESSED) != 0 &&
-	    (mpq_archive->mpq_block[mpq_archive->mpq_map[file_number].block_table_indices].flags & LIBMPQ_FLAG_SINGLE) == 0) {
+    /* check if we need to load the packed block offset table, we will maintain this table for unpacked files too. */
+    if ((mpq_archive->mpq_block[mpq_archive->mpq_map[file_number].block_table_indices].flags & LIBMPQ_FLAG_COMPRESSED) != 0 &&
+        (mpq_archive->mpq_block[mpq_archive->mpq_map[file_number].block_table_indices].flags & LIBMPQ_FLAG_SINGLE) == 0) {
 
-		/* seek to block position. */
-		if (fseeko(mpq_archive->fp, mpq_archive->mpq_block[mpq_archive->mpq_map[file_number].block_table_indices].offset + (((long long)mpq_archive->mpq_block_ex[mpq_archive->mpq_map[file_number].block_table_indices].offset_high) << 32) + mpq_archive->archive_offset, SEEK_SET) < 0) {
+        /* seek to block position. */
+        if (fseeko(mpq_archive->fp, mpq_archive->mpq_block[mpq_archive->mpq_map[file_number].block_table_indices].offset + (((long long)mpq_archive->mpq_block_ex[mpq_archive->mpq_map[file_number].block_table_indices].offset_high) << 32) + mpq_archive->archive_offset, SEEK_SET) < 0) {
 
-			/* seek in file failed. */
-			result = LIBMPQ_ERROR_SEEK;
-			goto error;
-		}
+            /* seek in file failed. */
+            result = LIBMPQ_ERROR_SEEK;
+            goto error;
+        }
 
-		/* read block positions from begin of file. */
-		if (fread(mpq_archive->mpq_file[file_number]->packed_offset, 1, packed_size, mpq_archive->fp) != packed_size) {
+        /* read block positions from begin of file. */
+        if (fread(mpq_archive->mpq_file[file_number]->packed_offset, 1, packed_size, mpq_archive->fp) != packed_size) {
 
-			/* something on read from archive failed. */
-			result = LIBMPQ_ERROR_READ;
-			goto error;
-		}
+            /* something on read from archive failed. */
+            result = LIBMPQ_ERROR_READ;
+            goto error;
+        }
 
-		/* check if the archive is protected some way, sometimes the file appears not to be encrypted, but it is.
-		 * a special case are files with an additional sector but LIBMPQ_FLAG_CRC not set. we don't want to handle
-		 * them as encrypted. */
-		if (mpq_archive->mpq_file[file_number]->packed_offset[0] != packed_size &&
-		    mpq_archive->mpq_file[file_number]->packed_offset[0] != packed_size + 4) {
+        /* check if the archive is protected some way, sometimes the file appears not to be encrypted, but it is.
+         * a special case are files with an additional sector but LIBMPQ_FLAG_CRC not set. we don't want to handle
+         * them as encrypted. */
+        if (mpq_archive->mpq_file[file_number]->packed_offset[0] != packed_size &&
+            mpq_archive->mpq_file[file_number]->packed_offset[0] != packed_size + 4) {
 
-			/* file is encrypted. */
-			mpq_archive->mpq_block[mpq_archive->mpq_map[file_number].block_table_indices].flags |= LIBMPQ_FLAG_ENCRYPTED;
-		}
+            /* file is encrypted. */
+            mpq_archive->mpq_block[mpq_archive->mpq_map[file_number].block_table_indices].flags |= LIBMPQ_FLAG_ENCRYPTED;
+            }
 
-		/* check if packed offset block is encrypted, we have to decrypt it. */
-		if (mpq_archive->mpq_block[mpq_archive->mpq_map[file_number].block_table_indices].flags & LIBMPQ_FLAG_ENCRYPTED) {
+            /* check if packed offset block is encrypted, we have to decrypt it. */
+            if (mpq_archive->mpq_block[mpq_archive->mpq_map[file_number].block_table_indices].flags & LIBMPQ_FLAG_ENCRYPTED) {
 
-			/* check if we don't know the file seed, try to find it. */
-			if (libmpq__decrypt_key((uint8_t *)mpq_archive->mpq_file[file_number]->packed_offset, packed_size, mpq_archive->block_size, &mpq_archive->mpq_file[file_number]->seed) < 0) {
+                /* FIX: Pass address of a local aligned stack variable instead of packed struct member */
+                uint32_t local_seed = mpq_archive->mpq_file[file_number]->seed;
 
-				/* sorry without seed, we cannot extract file. */
-				result = LIBMPQ_ERROR_DECRYPT;
-				goto error;
-			}
+                if (libmpq__decrypt_key((uint8_t *)mpq_archive->mpq_file[file_number]->packed_offset, packed_size, mpq_archive->block_size, &local_seed) < 0) {
 
-			/* decrypt block in input buffer. */
-			if (libmpq__decrypt_block(mpq_archive->mpq_file[file_number]->packed_offset, packed_size, mpq_archive->mpq_file[file_number]->seed - 1) < 0 ) {
+                    /* sorry without seed, we cannot extract file. */
+                    result = LIBMPQ_ERROR_DECRYPT;
+                    goto error;
+                }
 
-				/* something on decrypt failed. */
-				result = LIBMPQ_ERROR_DECRYPT;
-				goto error;
-			}
+                /* Assign back the successfully updated seed */
+                mpq_archive->mpq_file[file_number]->seed = local_seed;
 
-			/* check if the block positions are correctly decrypted. */
-			if (mpq_archive->mpq_file[file_number]->packed_offset[0] != packed_size) {
+                /* decrypt block in input buffer. */
+                if (libmpq__decrypt_block(mpq_archive->mpq_file[file_number]->packed_offset, packed_size, mpq_archive->mpq_file[file_number]->seed - 1) < 0 ) {
 
-				/* sorry without seed, we cannot extract file. */
-				result = LIBMPQ_ERROR_DECRYPT;
-				goto error;
-			}
-		}
-	} else {
+                    /* something on decrypt failed. */
+                    result = LIBMPQ_ERROR_DECRYPT;
+                    goto error;
+                }
 
-		/* check if file is not stored in a single sector. */
-		if ((mpq_archive->mpq_block[mpq_archive->mpq_map[file_number].block_table_indices].flags & LIBMPQ_FLAG_SINGLE) == 0) {
+                /* check if the block positions are correctly decrypted. */
+                if (mpq_archive->mpq_file[file_number]->packed_offset[0] != packed_size) {
 
-			/* loop through all blocks and create packed block offset table based on block size. */
-			for (i = 0; i < ((mpq_archive->mpq_block[mpq_archive->mpq_map[file_number].block_table_indices].unpacked_size + mpq_archive->block_size - 1) / mpq_archive->block_size + 1); i++) {
+                    /* sorry without seed, we cannot extract file. */
+                    result = LIBMPQ_ERROR_DECRYPT;
+                    goto error;
+                }
+            }
+        } else {
 
-				/* check if we process the last block. */
-				if (i == ((mpq_archive->mpq_block[mpq_archive->mpq_map[file_number].block_table_indices].unpacked_size + mpq_archive->block_size - 1) / mpq_archive->block_size)) {
+            /* check if file is not stored in a single sector. */
+            if ((mpq_archive->mpq_block[mpq_archive->mpq_map[file_number].block_table_indices].flags & LIBMPQ_FLAG_SINGLE) == 0) {
 
-					/* store size of last block. */
-					mpq_archive->mpq_file[file_number]->packed_offset[i] = mpq_archive->mpq_block[mpq_archive->mpq_map[file_number].block_table_indices].unpacked_size;
-				} else {
+                /* loop through all blocks and create packed block offset table based on block size. */
+                for (i = 0; i < ((mpq_archive->mpq_block[mpq_archive->mpq_map[file_number].block_table_indices].unpacked_size + mpq_archive->block_size - 1) / mpq_archive->block_size + 1); i++) {
 
-					/* store default block size. */
-					mpq_archive->mpq_file[file_number]->packed_offset[i] = i * mpq_archive->block_size;
-				}
-			}
-		} else {
+                    /* check if we process the last block. */
+                    if (i == ((mpq_archive->mpq_block[mpq_archive->mpq_map[file_number].block_table_indices].unpacked_size + mpq_archive->block_size - 1) / mpq_archive->block_size)) {
 
-			/* store offsets. */
-			mpq_archive->mpq_file[file_number]->packed_offset[0] = 0;
-			mpq_archive->mpq_file[file_number]->packed_offset[1] = mpq_archive->mpq_block[mpq_archive->mpq_map[file_number].block_table_indices].packed_size;
-		}
-	}
+                        /* store size of last block. */
+                        mpq_archive->mpq_file[file_number]->packed_offset[i] = mpq_archive->mpq_block[mpq_archive->mpq_map[file_number].block_table_indices].unpacked_size;
+                    } else {
 
-	/* if no error was found, return zero. */
-	return LIBMPQ_SUCCESS;
+                        /* store default block size. */
+                        mpq_archive->mpq_file[file_number]->packed_offset[i] = i * mpq_archive->block_size;
+                    }
+                }
+            } else {
 
-error:
+                /* store offsets. */
+                mpq_archive->mpq_file[file_number]->packed_offset[0] = 0;
+                mpq_archive->mpq_file[file_number]->packed_offset[1] = mpq_archive->mpq_block[mpq_archive->mpq_map[file_number].block_table_indices].packed_size;
+            }
+        }
 
-	/* free packed block offset table and file pointer. */
-	free(mpq_archive->mpq_file[file_number]->packed_offset);
-	free(mpq_archive->mpq_file[file_number]);
+        /* if no error was found, return zero. */
+        return LIBMPQ_SUCCESS;
 
-	/* return error constant. */
-	return result;
+        error:
+
+        /* free packed block offset table and file pointer. */
+        free(mpq_archive->mpq_file[file_number]->packed_offset);
+        free(mpq_archive->mpq_file[file_number]);
+
+        /* return error constant. */
+        return result;
 }
 
 /* this function free the file pointer to the opened file in archive. */

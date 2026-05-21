@@ -1,6 +1,12 @@
 #ifndef MANGOS_IO_TIMER_ASYNCSYSTEMTIMER_H
 #define MANGOS_IO_TIMER_ASYNCSYSTEMTIMER_H
 
+// Push current diagnostic state and ignore the aggressive array-bounds tracking for this file
+#if defined(__GNUC__) && __GNUC__ >= 11
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
+
 #include "Common.h"
 #include "Log.h"
 #include "Policies/Singleton.h"
@@ -13,6 +19,11 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #undef WIN32_LEAN_AND_MEAN
+#endif
+
+// Pop and restore the original diagnostic state so rest of core codebase stays strictly checked
+#if defined(__GNUC__) && __GNUC__ >= 11
+#pragma GCC diagnostic pop
 #endif
 
 namespace IO { namespace Timer {
